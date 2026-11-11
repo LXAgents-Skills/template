@@ -4,6 +4,40 @@ The template's only version. It is copied, never released, so it stays at `0.0.0
 repository made from it starts its own history there. Each change to the template adds a dated
 section below, newest first.
 
+## 2026-11-11 — Migrate to TypeScript
+
+The server, its tests and `npm run init` are TypeScript under `strict`. `tsc` compiles `src/`
+into `dist/`, and everything that runs the server runs `dist/`. Tool IDs, the tool surface, the
+SDK calls and HTTP auth are unchanged. The version stays `0.0.0`.
+
+### Added
+
+- `tsconfig.json` (ES2022, NodeNext, `strict`, `src/` to `dist/`) and `tsconfig.check.json`
+  (type-checks `src/`, `test/` and `scripts/` without output).
+- Scripts `build` and `prepare` (`tsc`), and `typecheck`.
+- Dev dependencies `typescript` 7.0.2, `@types/node` 26.6.6, `tsx` 4.23.15,
+  `@types/express` 5.0.6.
+
+### Modified
+
+- Every `.js` in `src/`, `test/` and `scripts/` is now `.ts`, with types for the config, the
+  server options, the served tools, the HTTP app options and the init flags and identity.
+- Dependencies at their latest: `@modelcontextprotocol/sdk` 1.32.2, `express` 5.3.0, `zod`
+  4.6.7. `npm audit` reports 0 vulnerabilities.
+- `main`, `bin`, `start`, `start:http`, `cli`, `tools` and `inspect` run `dist/`. `test` is
+  `node --import tsx --test test/*.test.ts`; `init` is `tsx scripts/init.ts`.
+- Install by git clone is unchanged in shape: `npm install` builds `dist/` through `prepare`.
+  Client registrations point at `dist/index.js` instead of `src/index.js`.
+- `npm run init` rewrites `src/identity.ts`, writes `dist/` bins, rebuilds `dist/`, and boots the
+  tool list from it. Its end-to-end test accepts any new-prefix tool rather than the template's
+  example, and checks the repository map, whose version-test note `init` now strips.
+- The Docker image builds in two stages; the compiler stays out of the runtime image.
+- The repository rule against a build step now describes the one `tsc` build instead.
+
+### Deleted
+
+- The JavaScript sources, replaced by the TypeScript ones above.
+
 ## 2026-11-11 — Pin the version at 0.0.0
 
 ### Added

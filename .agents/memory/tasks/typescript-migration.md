@@ -5,7 +5,7 @@ description: Migrating LXAgents-Skills/template from JavaScript to TypeScript - 
 
 # Task: migrate the template to TypeScript
 
-**Status: in progress.**
+**Status: done.**
 
 The owner asked every Node.js repository in the organization to move to TypeScript with the
 same checklist: latest dependencies and a clean `npm audit`; a strict NodeNext `tsconfig.json`
@@ -40,11 +40,11 @@ separately.
 
 | # | Task | Branch | PR |
 |---|---|---|---|
-| 1 | This record | `plan/typescript-migration` | |
-| 2 | Latest dependencies, clean audit | `build/dependencies` | |
-| 3 | tsconfig, conversion, scripts, init, Docker | `refactor/typescript` | |
-| 4 | Rules, README, wiki, agent wiki | `docs/typescript` | |
-| 5 | Changelog, close this record | `release/0.0.0` | |
+| 1 | This record | `plan/typescript-migration` | #10 |
+| 2 | Latest dependencies, clean audit | `build/dependencies` | #11 |
+| 3 | tsconfig, conversion, scripts, init, Docker | `refactor/typescript` | #12 |
+| 4 | Rules, README, wiki, agent wiki | `docs/typescript` | #13 |
+| 5 | Changelog, close this record | `release/0.0.0` | #14 |
 
 ## Rules set aside, by the owner's instruction
 
@@ -119,3 +119,9 @@ The second gap from the agentic bootstrap is fixed: the repository map's row for
 `test/template-version.test.ts` was a table row `init` left behind; it is now a
 `<!-- template-only -->` note that `init` strips, and the init end-to-end test checks the
 repository map for template-only text too. 38 tests pass; typecheck clean.
+
+### Task 5 — release/0.0.0
+
+Landed. A dated "Migrate to TypeScript" section at the top of
+`wiki/logs/0/0/0/CHANGELOG.md`. `package.json`, the lockfile and tags untouched. PR column
+filled. Record done.
