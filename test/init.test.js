@@ -79,7 +79,10 @@ test("init turns a copy of the template into a new repository that passes its ow
     assert.doesNotMatch(hub, /lxagents_skills_template_/);
     assert.match(readFileSync(join(copy, "AGENTS.md"), "utf8"), /`Acme-Labs\/field-notes`/);
     assert.equal(existsSync(join(copy, ".agents/memory/tasks")), false, "the template's history is cleared");
-    assert.equal(existsSync(join(copy, "wiki/guides/create-a-new-repository.md")), false);
+    for (const file of ["wiki/guides/create-a-new-repository.md", ".agents/rules/template-version.md", "test/template-version.test.js"]) {
+      assert.equal(existsSync(join(copy, file)), false, `${file} is template-only`);
+    }
+    assert.equal(JSON.parse(readFileSync(join(copy, "package.json"), "utf8")).version, "0.0.0");
     const lock = JSON.parse(readFileSync(join(copy, "package-lock.json"), "utf8"));
     assert.deepEqual(Object.keys(lock.packages[""].bin), ["acme-field-notes", "acme-field-notes-server"]);
     for (const page of ["AGENTS.md", "README.md", ".agents/index/project-wiki-index.md"]) {

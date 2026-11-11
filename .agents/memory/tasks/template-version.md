@@ -53,3 +53,11 @@ from it starts its own version history from `0.0.0`.
 ### Task 1 — plan/template-version
 
 Landed: this record and its row in `memory-index.md`.
+
+### Task 2 — feat/version-pin
+
+Landed. `package.json`, `package-lock.json` (top level and `packages[""]`) at `0.0.0`.
+`test/template-version.test.js` checks all three and the version the server reports; it was
+seen to fail with `package.json` at `0.1.0`. `scripts/init.js` lists it and
+`.agents/rules/template-version.md` (written in task 3) in `TEMPLATE_ONLY`, and the init
+end-to-end test asserts both are gone and the copy is at `0.0.0`. 39 tests pass.

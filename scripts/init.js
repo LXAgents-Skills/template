@@ -39,8 +39,12 @@ Options
 /** Paths the template's own history lives in. A new repository starts without them. */
 const HISTORY = [".agents/memory/tasks", ".agents/memory/decisions", ".agents/memory/state", "wiki/logs"];
 
-/** Files that are true only of the template itself. */
-const TEMPLATE_ONLY = ["wiki/guides/create-a-new-repository.md"];
+/** Files that are true only of the template itself, including its version pin. */
+const TEMPLATE_ONLY = [
+  "wiki/guides/create-a-new-repository.md",
+  ".agents/rules/template-version.md",
+  "test/template-version.test.js",
+];
 
 /** Fresh indexes for the history that was cleared. */
 const FRESH_INDEXES = {
