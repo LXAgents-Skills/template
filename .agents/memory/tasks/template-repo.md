@@ -45,3 +45,22 @@ Neither reference repository is changed by this task.
 
 Landed: this record, its row in `memory-index.md`, `.gitignore` (which keeps `.agents/plans/`
 out of history) and `.gitattributes`.
+
+### Task 2 — feat/server
+
+Landed. The source layout follows security: `config.js`, `run.js`, `stdio.js`, `http/`
+(app, auth, primary, worker, rpc-error) and `cli.js`. What is new for the template:
+
+- `src/identity.js` is the only file that names the server: `ORG_NAME`, `REPO_NAME`,
+  `SERVER_ID`, `SERVER_TITLE`, `SERVER_SUMMARY`. `TOOL_PREFIX` and `toolId()` are derived.
+- `src/instructions/naming.js` owns the ID rule: `derivedBase`, `OVERRIDE_BASES` (base names
+  only), and the 64-character cap, now enforced at boot rather than only in a test.
+- `src/paths.js` and `src/version.js` split what security keeps in one file.
+- Tools are registered with `registerTool`; `listTools()` feeds the CLI.
+- `content/automation.md` and one example tool, `content/example/example-guide.md`.
+
+The tests are written against whatever `content/` holds, so a repository made from the
+template keeps them: the bijection, the ID rule, no arguments, byte-for-byte content, the hub
+listing every tool once, the naming errors on throwaway sets, the config, and HTTP auth
+(token off loopback, localhost `Host` on loopback, the real entry point refusing `0.0.0.0`
+without a token). 31 tests pass.
