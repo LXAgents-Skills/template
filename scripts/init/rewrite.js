@@ -51,3 +51,11 @@ export function rewritePackage(source, identity) {
 export function replaceAll(text, pairs) {
   return pairs.reduce((out, [from, to]) => (from === to ? out : out.split(from).join(to)), text);
 }
+
+/**
+ * Drop every `<!-- template-only -->` … `<!-- /template-only -->` block, markers included,
+ * with the line break after it. Text that is true only of the template itself lives there.
+ */
+export function stripTemplateOnly(text) {
+  return text.replace(/<!-- template-only -->[\s\S]*?<!-- \/template-only -->\r?\n?/g, "");
+}
