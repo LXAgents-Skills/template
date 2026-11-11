@@ -105,3 +105,17 @@ included `test/helpers.js`, which `node --test` ran as a test file); stdio initi
 `tools/list` and `tools/call` answered from `dist/index.js`; HTTP with two workers on
 127.0.0.1 answered `/healthz` and `tools/list`; on 0.0.0.0 without a token it exits 1.
 `npm audit`: 0 vulnerabilities.
+
+### Task 4 — docs/typescript
+
+Landed. Every source path in the docs and rules now names its `.ts` file; every command that
+runs the server names `dist/`. `.agents/rules/repository.md` gains a "TypeScript, compiled to
+`dist/`" section and the new commands, and its "no build step" ban becomes "no second build
+step and no committed `dist/`", plus no unchecked `any` or `@ts-ignore`. The install guide,
+the Docker page, the architecture page, the create-a-new-repository guide (init rebuilds
+`dist/`), `AGENTS.md` and the repository map are updated.
+
+The second gap from the agentic bootstrap is fixed: the repository map's row for
+`test/template-version.test.ts` was a table row `init` left behind; it is now a
+`<!-- template-only -->` note that `init` strips, and the init end-to-end test checks the
+repository map for template-only text too. 38 tests pass; typecheck clean.

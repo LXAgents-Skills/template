@@ -85,7 +85,13 @@ test("init turns a copy of the template into a new repository that passes its ow
     assert.equal(JSON.parse(readFileSync(join(copy, "package.json"), "utf8")).version, "0.0.0");
     const lock = JSON.parse(readFileSync(join(copy, "package-lock.json"), "utf8"));
     assert.deepEqual(Object.keys(lock.packages[""].bin), ["acme-field-notes", "acme-field-notes-server"]);
-    for (const page of ["AGENTS.md", "README.md", ".agents/index/project-wiki-index.md", ".agents/index/agents-index.md"]) {
+    for (const page of [
+      "AGENTS.md",
+      "README.md",
+      ".agents/index/project-wiki-index.md",
+      ".agents/index/agents-index.md",
+      ".agents/wiki/context/repository-map.md",
+    ]) {
       const text = readFileSync(join(copy, page), "utf8");
       assert.doesNotMatch(text, /template-only|create-a-new-repository|template-version/, `${page} keeps template-only text`);
     }

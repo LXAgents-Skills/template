@@ -2,14 +2,17 @@
 
 ## From a request to a file
 
-1. `src/index.js` reads the environment once (`src/config.js`) and calls `run()`.
-2. `src/run.js` picks the transport. stdio starts `src/stdio.js`. HTTP starts
-   `src/http/primary.js`, which refuses to start without a required token and forks workers;
-   each worker (`src/http/worker.js`) listens with the app from `src/http/app.js`.
+The source is TypeScript in `src/`; `tsc` compiles it to `dist/`, which is what runs. The steps
+below name the source files.
+
+1. `src/index.ts` reads the environment once (`src/config.ts`) and calls `run()`.
+2. `src/run.ts` picks the transport. stdio starts `src/stdio.ts`. HTTP starts
+   `src/http/primary.ts`, which refuses to start without a required token and forks workers;
+   each worker (`src/http/worker.ts`) listens with the app from `src/http/app.ts`.
 3. Each connection, or each HTTP request, gets a fresh server from `createServer()` in
-   `src/server.js`, which calls `registerTool` once per entry in `CONTENT_INSTRUCTIONS`.
-4. `CONTENT_INSTRUCTIONS` is built once, at import, by `src/instructions/from-content.js`: one
-   tool per `.md` file in `content/`, its ID from `src/instructions/naming.js`, its description
+   `src/server.ts`, which calls `registerTool` once per entry in `CONTENT_INSTRUCTIONS`.
+4. `CONTENT_INSTRUCTIONS` is built once, at import, by `src/instructions/from-content.ts`: one
+   tool per `.md` file in `content/`, its ID from `src/instructions/naming.ts`, its description
    from the file's frontmatter, and a handler that returns the file byte for byte.
 
 ## Why the set is checked at boot
@@ -20,7 +23,7 @@ that cannot be routed on should not start.
 
 ## One name, one place
 
-`src/identity.js` holds the org, repo, server ID, title and summary. The tool prefix, every ID,
+`src/identity.ts` holds the org, repo, server ID, title and summary. The tool prefix, every ID,
 the health check and every log line come from it, which is what lets `npm run init` rename a
 copy by rewriting that one file and the documentation.
 

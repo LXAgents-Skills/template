@@ -25,7 +25,7 @@ description: When MCP_AUTH_TOKEN is required - only for HTTP bound off loopback 
 
 ## Secrets
 
-* `MCP_AUTH_TOKEN` is read at call time by `src/http/auth.js`, not captured at import.
+* `MCP_AUTH_TOKEN` is read at call time by `src/http/auth.ts`, not captured at import.
 * Never log it, echo it, put it in an error, a test fixture, a Dockerfile `ENV` line, or a
   committed file. Error messages name the variable and the fix, never the value.
 * No tool reads a credential. A served file is public text.

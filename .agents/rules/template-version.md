@@ -21,7 +21,7 @@ inherited by nobody and would claim a release nothing can consume.
 | What the server reports (`--version`, `/healthz`, the MCP handshake) | `0.0.0`, read from `package.json` |
 | Git tags and GitHub releases | None |
 
-`test/template-version.test.js` fails if any of these leaves `0.0.0`. Never change it to make a
+`test/template-version.test.ts` fails if any of these leaves `0.0.0`. Never change it to make a
 bump pass, and never propose a bump for the template, whatever the change.
 
 ## The release task

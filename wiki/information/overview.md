@@ -18,7 +18,7 @@ repository starts its version history from zero.
 |---|---|
 | Skill MCP over stdio | `npm start` |
 | Skill MCP over HTTP | `npm run start:http` (loopback, no token) or a container (token required) |
-| Command line | `node src/cli.js tools`, `--help`, `--version` |
+| Command line | `node dist/cli.js tools`, `--help`, `--version` |
 
 The tools are derived from `content/` at boot. Adding a file adds a tool; there is no tool code
 to write. Nothing writes, and nothing reaches a network.

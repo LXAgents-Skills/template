@@ -1,7 +1,9 @@
 # Docker
 
-The image is one stage: `node:22-alpine`, production dependencies from the lockfile, `src/` and
-`content/`, run as the `node` user. It defaults to HTTP on `0.0.0.0:3000`, so it needs a token.
+The image has two stages on `node:22-alpine`. The first installs every dependency and compiles
+`src/` into `dist/`. The second installs production dependencies from the lockfile, copies in
+`dist/` and `content/`, and runs `node dist/index.js` as the `node` user; the compiler never
+reaches it. It defaults to HTTP on `0.0.0.0:3000`, so it needs a token.
 
 ```bash
 docker build -t lxagents-template .

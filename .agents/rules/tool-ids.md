@@ -13,8 +13,8 @@ Every file in `content/` is served as a tool, and its ID is derived, never chose
 
 | Part | Comes from | Example |
 |---|---|---|
-| `{org}` | `ORG_NAME` in `src/identity.js`, through `idPart()` | `LXAgents-Skills` → `lxagents_skills` |
-| `{repo}` | `REPO_NAME` in `src/identity.js`, through `idPart()` | `shared-instruction` → `shared_instruction` |
+| `{org}` | `ORG_NAME` in `src/identity.ts`, through `idPart()` | `LXAgents-Skills` → `lxagents_skills` |
+| `{repo}` | `REPO_NAME` in `src/identity.ts`, through `idPart()` | `shared-instruction` → `shared_instruction` |
 | `{base}` | The file's own name, or its `OVERRIDE_BASES` entry | `git/branching-strategy.md` → `branching_strategy` |
 
 `{org}_{repo}` is `TOOL_PREFIX`. It is the same for every tool on the server, and it exists
@@ -57,7 +57,7 @@ Check before you name a file: `npm run tools` prints every ID and its length.
 
 ## Overrides
 
-`OVERRIDE_BASES` in `src/instructions/naming.js` maps a set-relative path to a base name.
+`OVERRIDE_BASES` in `src/instructions/naming.ts` maps a set-relative path to a base name.
 The prefix is added by `toolId()`, so an entry is a base only:
 
 ```js
@@ -79,6 +79,6 @@ export const OVERRIDE_BASES = Object.freeze({
 
 | Check | Where |
 |---|---|
-| Valid characters, 64-character cap, collisions, stale overrides | At boot, `src/instructions/from-content.js` |
-| Every ID starts with `TOOL_PREFIX_` and matches the derivation | `test/server.test.js` |
-| The derivation itself, overrides, and each refusal | `test/naming.test.js` |
+| Valid characters, 64-character cap, collisions, stale overrides | At boot, `src/instructions/from-content.ts` |
+| Every ID starts with `TOOL_PREFIX_` and matches the derivation | `test/server.test.ts` |
+| The derivation itself, overrides, and each refusal | `test/naming.test.ts` |
