@@ -1,0 +1,55 @@
+---
+name: memory-tasks-template-version
+description: Pinning LXAgents-Skills/template at version 0.0.0 forever, so every repository made from it starts its own versioning from zero.
+---
+
+# Task: pin the template at 0.0.0
+
+The template was released as `0.1.0` (`wiki/logs/0/1/0/`). The owner wants it to stay at
+`0.0.0` for good: it is never installed as a product, only copied, and every repository made
+from it starts its own version history from `0.0.0`.
+
+## What changes
+
+- `package.json` and `package-lock.json` go to `0.0.0`. The server reads its version from
+  `package.json`, so the CLI and `/healthz` report it too.
+- A template-only rule, `.agents/rules/template-version.md`, and a template-only test,
+  `test/template-version.test.js`, which fails if either file leaves `0.0.0`.
+- `npm run init` deletes that rule and that test, as it already deletes the
+  create-a-new-repository guide. It already resets a new repository to `0.0.0`.
+- The release notes become one rolling changelog, `wiki/logs/0/0/0/CHANGELOG.md`, with dated
+  sections, newest first. The `0.1.0` notes move into it and `wiki/logs/0/1/0/` is removed.
+
+## What does not change
+
+- The server, its tools, the ID rule, HTTP auth, and everything `init` does for a new
+  repository other than removing the two new files.
+- `LXAgents-Skills/shared-instruction` and `LXAgents-Skills/security`.
+
+## The plan
+
+| # | Task | Branch | PR |
+|---|---|---|---|
+| 1 | This record | `plan/template-version` | |
+| 2 | Version files, the version test, `init` removes it | `feat/version-pin` | |
+| 3 | The rule, `AGENTS.md`, indexes, the guide | `docs/version-pin` | |
+| 4 | Rolling changelog, logs index, close this record | `release/0.0.0` | |
+
+## Rules set aside, by the owner's instruction
+
+- **Never delete a version directory** (shared `versioning`). `wiki/logs/0/1/0/` is folded into
+  `wiki/logs/0/0/0/`. No tag and no published package exists for `0.1.0`.
+- **`release/{version}` names the version it ships** (shared `plan_creator`, project
+  `AGENTS.md`). The template's release branch is always `release/0.0.0`; it adds a dated
+  changelog entry and never changes `package.json`.
+
+## Decisions taken without the owner
+
+- The version change rides in task 2 with the test that guards it, so every branch is green.
+  The release task carries release notes only.
+
+## Progress
+
+### Task 1 — plan/template-version
+
+Landed: this record and its row in `memory-index.md`.

@@ -8,3 +8,4 @@ description: Router over .agents/memory/ - one row per task, decision, or state 
 | File | Scope |
 |---|---|
 | [`tasks/template-repo.md`](../memory/tasks/template-repo.md) | Building the template repository itself (plan, branches, decisions) |
+| [`tasks/template-version.md`](../memory/tasks/template-version.md) | Pinning the template at version `0.0.0` (plan, branches, rules set aside) |
