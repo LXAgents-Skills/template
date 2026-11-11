@@ -12,7 +12,7 @@ import { version } from "./version.js";
 const HELP = `${SERVER_ID} - a Skill MCP instruction set, served read-only
 
 Usage
-  node src/cli.js <command>
+  node dist/cli.js <command>
 
 Commands
   serve            Run the Skill MCP server
@@ -33,17 +33,20 @@ Environment
   MCP_CLUSTER_WORKERS  HTTP worker count, default one per CPU; 1 forks nothing`;
 
 /** The value after `flag` in `args`, or `undefined`. */
-function flagValue(args, flag) {
+function flagValue(args: readonly string[], flag: string): string | undefined {
   const at = args.indexOf(flag);
   return at === -1 ? undefined : args[at + 1];
 }
+
+/** The environment variables a `serve` flag can set. */
+type ServeOverrides = Partial<Record<"MCP_TRANSPORT" | "PORT" | "HOST", string>>;
 
 /**
  * Environment overrides from `serve` flags. They are not written back to `process.env`: a
  * forked HTTP worker re-runs this file with the same arguments and reaches the same result.
  */
-function serveOverrides(args) {
-  const overrides = {};
+function serveOverrides(args: readonly string[]): ServeOverrides {
+  const overrides: ServeOverrides = {};
   if (args.includes("--http")) overrides.MCP_TRANSPORT = "http";
   if (args.includes("--stdio")) overrides.MCP_TRANSPORT = "stdio";
   const port = flagValue(args, "--port");
@@ -53,12 +56,12 @@ function serveOverrides(args) {
   return overrides;
 }
 
-async function serve(args) {
+async function serve(args: readonly string[]): Promise<void> {
   const [{ loadConfig }, { run }] = await Promise.all([import("./config.js"), import("./run.js")]);
   await run(loadConfig({ ...process.env, ...serveOverrides(args) }));
 }
 
-async function printTools() {
+async function printTools(): Promise<void> {
   const { listTools } = await import("./server.js");
   const tools = listTools();
   const width = Math.max(0, ...tools.map((tool) => tool.name.length));

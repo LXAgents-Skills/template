@@ -1,4 +1,7 @@
 node_modules/
+
+# Compiled by `npm run build`, and by `prepare` on every `npm install`
+dist/
 *.log
 .env
 .env.*

@@ -8,7 +8,7 @@ import { buildContentInstructions } from "../src/instructions/from-content.js";
 import { MAX_ID_LENGTH, derivedBase, nameProblem, toolNameFor } from "../src/instructions/naming.js";
 
 /** A throwaway set: `files` maps a set-relative path to its text. */
-function withSet(files, run) {
+function withSet<T>(files: Record<string, string>, run: (dir: string) => T): T {
   const dir = mkdtempSync(join(tmpdir(), "content-"));
   try {
     for (const [path, text] of Object.entries(files)) {
@@ -46,32 +46,32 @@ test("an override replaces the base only, never the prefix", () => {
 
 test("an ID over 64 characters or with a bad character is refused", () => {
   assert.equal(nameProblem("a".repeat(MAX_ID_LENGTH)), null);
-  assert.match(nameProblem("a".repeat(MAX_ID_LENGTH + 1)), /65 characters/);
-  assert.match(nameProblem("1abc"), /not a valid tool name/);
-  assert.match(nameProblem("ab.c"), /not a valid tool name/);
+  assert.match(nameProblem("a".repeat(MAX_ID_LENGTH + 1)) ?? "", /65 characters/);
+  assert.match(nameProblem("1abc") ?? "", /not a valid tool name/);
+  assert.match(nameProblem("ab.c") ?? "", /not a valid tool name/);
 });
 
 test("a set with a file and no description does not build", () => {
-  withSet({ "a.md": "# no frontmatter\n" }, (dir) => {
+  withSet({ "a.md": "# no frontmatter\n" }, (dir: string) => {
     assert.throws(() => buildContentInstructions(dir, {}), /no frontmatter `description:`/);
   });
 });
 
 test("two files deriving one ID do not build", () => {
-  withSet({ "one/same.md": doc(), "two/same.md": doc() }, (dir) => {
+  withSet({ "one/same.md": doc(), "two/same.md": doc() }, (dir: string) => {
     assert.throws(() => buildContentInstructions(dir, {}), /both derive/);
   });
 });
 
 test("an override that matches no file does not build", () => {
-  withSet({ "a.md": doc() }, (dir) => {
+  withSet({ "a.md": doc() }, (dir: string) => {
     assert.throws(() => buildContentInstructions(dir, { "gone.md": "gone" }), /not in the set/);
   });
 });
 
 test("a filename too long for 64 characters does not build until it is overridden", () => {
   const path = `${"long-".repeat(12)}name.md`;
-  withSet({ [path]: doc() }, (dir) => {
+  withSet({ [path]: doc() }, (dir: string) => {
     assert.throws(() => buildContentInstructions(dir, {}), /OVERRIDE_BASES/);
     const { tools } = buildContentInstructions(dir, { [path]: "long_name" });
     assert.equal(tools[0].config.name, toolId("long_name"));
@@ -79,7 +79,7 @@ test("a filename too long for 64 characters does not build until it is overridde
 });
 
 test("an empty set does not build", () => {
-  withSet({ "notes.txt": "not markdown" }, (dir) => {
+  withSet({ "notes.txt": "not markdown" }, (dir: string) => {
     assert.throws(() => buildContentInstructions(dir, {}), /expose nothing/);
   });
 });

@@ -1,4 +1,5 @@
 import { createHash, timingSafeEqual } from "node:crypto";
+import type { RequestHandler } from "express";
 import { rpcError } from "./rpc-error.js";
 
 /**
@@ -17,7 +18,7 @@ import { rpcError } from "./rpc-error.js";
  * rebinding. Any other bind — `0.0.0.0`, a container, a public address — is a server, and it
  * still refuses to start without a token. A token that is set is always enforced.
  *
- * Nothing in this file is reached on the stdio path, and `src/stdio.js` never reads
+ * Nothing in this file is reached on the stdio path, and `src/stdio.ts` never reads
  * `MCP_AUTH_TOKEN`.
  */
 
@@ -28,7 +29,7 @@ import { rpcError } from "./rpc-error.js";
  * `test` is refused at startup instead of being discovered by a scanner. 32 characters is what
  * `openssl rand -hex 16` produces at the very least, and the documented command produces 64.
  */
-export const MIN_TOKEN_LENGTH = 32;
+export const MIN_TOKEN_LENGTH: number = 32;
 
 /**
  * The configured token, or an empty string when there is none.
@@ -37,10 +38,8 @@ export const MIN_TOKEN_LENGTH = 32;
  * happened to be set then, which breaks a process that sets it later and any test that sets and
  * unsets it. Surrounding whitespace is dropped, because a token copied out of a file or an
  * `env_file` often carries a trailing newline and an HTTP header cannot.
- *
- * @returns {string}
  */
-export function configuredToken() {
+export function configuredToken(): string {
   return (process.env.MCP_AUTH_TOKEN ?? "").trim();
 }
 
@@ -51,12 +50,11 @@ export function configuredToken() {
  *
  * `required: false` is the local case: no token at all is then fine, but a token that is set
  * and too short is still a problem, because it was meant to protect something and would not.
- *
- * @param {string} [token]
- * @param {{ required?: boolean }} [options]
- * @returns {string | null}
  */
-export function tokenProblem(token = configuredToken(), { required = true } = {}) {
+export function tokenProblem(
+  token: string = configuredToken(),
+  { required = true }: { required?: boolean } = {},
+): string | null {
   if (token === "") return required ? "MCP_AUTH_TOKEN is not set" : null;
   if (token.length < MIN_TOKEN_LENGTH) {
     return `MCP_AUTH_TOKEN is ${token.length} characters, and it must be at least ${MIN_TOKEN_LENGTH}`;
@@ -65,7 +63,7 @@ export function tokenProblem(token = configuredToken(), { required = true } = {}
 }
 
 /** SHA-256 of a string, so two values of any length compare in constant time. */
-function digest(value) {
+function digest(value: string): Buffer {
   return createHash("sha256").update(value).digest();
 }
 
@@ -75,13 +73,10 @@ function digest(value) {
  * The scheme is case-insensitive (RFC 7235). Anything else — another scheme, no credential, two
  * of them — is not a bearer credential. The pattern is linear: the space run and the credential
  * are disjoint character classes.
- *
- * @param {string | undefined} header
- * @returns {string | null}
  */
-function bearerCredential(header) {
+function bearerCredential(header: string | undefined): string | null {
   const match = /^Bearer +(\S+)$/i.exec(header ?? "");
-  return match ? match[1] : null;
+  return match ? match[1]! : null;
 }
 
 /**
@@ -95,10 +90,9 @@ function bearerCredential(header) {
  * The comparison is constant-time over fixed-length digests, so neither the token's length nor
  * how much of it a guess got right shows in how long the answer takes.
  *
- * @param {string} token A token that already passed `tokenProblem`.
- * @returns {import("express").RequestHandler}
+ * @param token A token that already passed `tokenProblem`.
  */
-export function requireBearerToken(token) {
+export function requireBearerToken(token: string): RequestHandler {
   const expected = digest(token);
 
   return (req, res, next) => {

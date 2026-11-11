@@ -8,17 +8,16 @@
  * The value is matched as `\S.*` rather than `.*`, so the run of spaces before it and the
  * value itself are different character classes and a line that fails to match costs one pass.
  *
- * @param {string} text
- * @returns {Record<string, string> | null} The fields, or `null` when there is no frontmatter.
+ * @returns The fields, or `null` when there is no frontmatter.
  */
-export function parseFrontmatter(text) {
+export function parseFrontmatter(text: string): Record<string, string> | null {
   const block = text.match(/^---\r?\n([\s\S]*?)\r?\n---/);
   if (!block) return null;
 
-  const fields = {};
-  for (const line of block[1].split(/\r?\n/)) {
+  const fields: Record<string, string> = {};
+  for (const line of block[1]!.split(/\r?\n/)) {
     const field = line.match(/^([A-Za-z_][A-Za-z0-9_]*):[ \t]*(\S.*|)$/);
-    if (field) fields[field[1]] = field[2].trim();
+    if (field) fields[field[1]!] = field[2]!.trim();
   }
   return fields;
 }

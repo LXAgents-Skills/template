@@ -33,7 +33,7 @@ test("the identity defaults follow the existing servers' naming", () => {
 });
 
 test("rewriteIdentity replaces every identity constant, multi-line values included", () => {
-  const source = readFileSync(join(ROOT, "src/identity.js"), "utf8");
+  const source = readFileSync(join(ROOT, "src/identity.ts"), "utf8");
   const next = identityFor({ org: "Acme", repo: "docs", summary: 'Say "hi".' });
   const out = rewriteIdentity(source, next);
 
@@ -48,7 +48,7 @@ test("rewritePackage renames the package and resets its version", () => {
   const pkg = JSON.parse(rewritePackage(readFileSync(join(ROOT, "package.json"), "utf8"), identityFor({ org: "Acme", repo: "docs" })));
   assert.equal(pkg.name, "@acme/docs");
   assert.equal(pkg.version, "0.0.0");
-  assert.deepEqual(pkg.bin, { "acme-docs": "src/cli.js", "acme-docs-server": "src/index.js" });
+  assert.deepEqual(pkg.bin, { "acme-docs": "dist/cli.js", "acme-docs-server": "dist/index.js" });
   assert.equal(pkg.repository.url, "git+https://github.com/Acme/docs.git");
 });
 
@@ -67,7 +67,7 @@ test("init turns a copy of the template into a new repository that passes its ow
     cpSync(ROOT, copy, { recursive: true, filter: (src) => !/[\\/](node_modules|\.git)$/.test(src) });
     symlinkSync(join(ROOT, "node_modules"), join(copy, "node_modules"), "junction");
 
-    const init = spawnSync(process.execPath, ["scripts/init.js", "--org", "Acme-Labs", "--repo", "field-notes"], {
+    const init = spawnSync(process.execPath, ["--import", "tsx", "scripts/init.ts", "--org", "Acme-Labs", "--repo", "field-notes"], {
       cwd: copy,
       encoding: "utf8",
     });
@@ -75,11 +75,11 @@ test("init turns a copy of the template into a new repository that passes its ow
     assert.match(init.stdout, /acme_labs_field_notes_automation/);
 
     const hub = readFileSync(join(copy, "content/automation.md"), "utf8");
-    assert.match(hub, /`acme_labs_field_notes_example_guide`/);
+    assert.match(hub, /`acme_labs_field_notes_[a-z0-9_]+`/, "the hub lists tools under the new prefix");
     assert.doesNotMatch(hub, /lxagents_skills_template_/);
     assert.match(readFileSync(join(copy, "AGENTS.md"), "utf8"), /`Acme-Labs\/field-notes`/);
     assert.equal(existsSync(join(copy, ".agents/memory/tasks")), false, "the template's history is cleared");
-    for (const file of ["wiki/guides/create-a-new-repository.md", ".agents/rules/template-version.md", "test/template-version.test.js"]) {
+    for (const file of ["wiki/guides/create-a-new-repository.md", ".agents/rules/template-version.md", "test/template-version.test.ts"]) {
       assert.equal(existsSync(join(copy, file)), false, `${file} is template-only`);
     }
     assert.equal(JSON.parse(readFileSync(join(copy, "package.json"), "utf8")).version, "0.0.0");
@@ -90,7 +90,12 @@ test("init turns a copy of the template into a new repository that passes its ow
       assert.doesNotMatch(text, /template-only|create-a-new-repository|template-version/, `${page} keeps template-only text`);
     }
 
-    const suite = spawnSync(process.execPath, ["--test", "test/server.test.js", "test/naming.test.js"], {
+    const built = spawnSync(process.execPath, ["dist/cli.js", "tools"], { cwd: copy, encoding: "utf8" });
+    assert.equal(built.status, 0, built.stderr);
+    assert.match(built.stdout, /acme_labs_field_notes_automation/, "init rebuilt dist/ with the new identity");
+    assert.doesNotMatch(built.stdout, /lxagents_skills_template_/);
+
+    const suite = spawnSync(process.execPath, ["--import", "tsx", "--test", "test/server.test.ts", "test/naming.test.ts"], {
       cwd: copy,
       encoding: "utf8",
     });

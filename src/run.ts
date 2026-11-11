@@ -1,4 +1,5 @@
 import cluster from "node:cluster";
+import type { Config } from "./config.js";
 
 /*
  * Choose the transport and start it.
@@ -9,10 +10,8 @@ import cluster from "node:cluster";
  * and an HTTP server never loads the stdio transport.
  */
 
-/**
- * @param {ReturnType<typeof import("./config.js").loadConfig>} config
- */
-export async function run(config) {
+/** Start the transport `config` names. */
+export async function run(config: Config): Promise<void> {
   if (config.transport === "http" || config.transport === "streamable-http") {
     if (cluster.isPrimary) {
       const { startPrimary } = await import("./http/primary.js");

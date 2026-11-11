@@ -1,3 +1,4 @@
+import type { Config } from "../config.js";
 import { SERVER_ID } from "../identity.js";
 import { version } from "../version.js";
 import { createApp } from "./app.js";
@@ -13,7 +14,7 @@ import { configuredToken } from "./auth.js";
  * session logic is written, because the scheduler already has the information
  * (which connection is next) that a sticky-session scheme would have to reconstruct.
  */
-export function startWorker({ port, host, allowedHosts, local }) {
+export function startWorker({ port, host, allowedHosts, local }: Config): void {
   // A worker whose primary is gone holds the port for whoever starts next. The test
   // harness kills the child process directly, so this is the difference between a
   // suite that passes and a suite that fails on its second run with EADDRINUSE.
@@ -63,7 +64,7 @@ export function startWorker({ port, host, allowedHosts, local }) {
    */
   let shuttingDown = false;
 
-  const shutdown = (signal) => {
+  const shutdown = (signal: NodeJS.Signals): void => {
     if (shuttingDown) return;
     shuttingDown = true;
     process.stderr.write(`${SERVER_ID} ${version} ${signal}, draining\n`);

@@ -1,14 +1,28 @@
 # syntax=docker/dockerfile:1
 
-# The payload is a directory of markdown and a few kilobytes of JavaScript.
-# There is no build step, so this is a single stage: a builder stage would copy
-# the same files twice to produce a smaller context, not a smaller image.
+# Two stages. The source is TypeScript, so the first stage installs the full tree and
+# compiles src/ into dist/; the second installs runtime dependencies only and copies
+# dist/ across. The compiler, the type packages and tsx never reach the image.
+FROM node:22-alpine AS build
+
+WORKDIR /build
+
+# Lifecycle scripts are disabled here too: `prepare` would run `tsc` before the
+# sources are copied in. The build is the explicit `npm run build` below.
+COPY package.json package-lock.json ./
+RUN npm ci --ignore-scripts
+
+COPY tsconfig.json ./
+COPY src ./src
+RUN npm run build
+
 FROM node:22-alpine
 
-# Lifecycle scripts are disabled. The package declares none, and running them
-# by default is supply-chain risk with nothing to offset it. `--omit=dev` keeps
-# the test-only tree out of the image; `.dockerignore` already excludes the
-# test files themselves, so this image cannot run its own suite.
+# Lifecycle scripts are disabled. `prepare` compiles TypeScript, which this stage has
+# no compiler for and no need of: dist/ comes from the build stage. Running scripts by
+# default is supply-chain risk with nothing to offset it. `--omit=dev` keeps the
+# toolchain and the test-only tree out of the image; `.dockerignore` already excludes
+# the test files themselves, so this image cannot run its own suite.
 #
 # Dependencies are installed from the lockfile only. `npm ci` fails rather than
 # silently resolving something the lockfile does not contain, which is the point
@@ -20,13 +34,13 @@ RUN npm ci --ignore-scripts --omit=dev
 
 # `content/` is the product. It is copied, not generated, and it is the only
 # thing in this image that a change to the repository is expected to alter.
-COPY src ./src
+COPY --from=build /build/dist ./dist
 COPY content ./content
 
 # Not root. The process reads files and answers JSON-RPC, and nothing else.
 USER node
 
-# 3000 is `src/index.js`'s default, and `PORT` overrides it at runtime. The
+# 3000 is `dist/index.js`'s default, and `PORT` overrides it at runtime. The
 # interface is `HOST`, which also defaults to 0.0.0.0 - every IPv4 interface.
 #
 # EXPOSE documents the port; it does not publish it. `docker run -p 3000:3000 …`
@@ -58,4 +72,4 @@ EXPOSE 3000
 # this machine. The Host allow-list is off unless it is set, and the server says
 # so on startup. See wiki/environments/env.md.
 ENV MCP_TRANSPORT=http
-ENTRYPOINT ["node", "src/index.js"]
+ENTRYPOINT ["node", "dist/index.js"]

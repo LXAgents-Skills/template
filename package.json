@@ -4,25 +4,28 @@
   "private": true,
   "description": "Template for LXAgents Skill MCP servers: every markdown file in content/ is served read-only as its own tool.",
   "type": "module",
-  "main": "src/index.js",
+  "main": "dist/index.js",
   "bin": {
-    "lxagents-template": "src/cli.js",
-    "lxagents-template-server": "src/index.js"
+    "lxagents-template": "dist/cli.js",
+    "lxagents-template-server": "dist/index.js"
   },
   "files": [
-    "src",
+    "dist",
     "content",
     "LICENSE",
     "README.md"
   ],
   "scripts": {
-    "start": "node src/index.js",
-    "start:http": "node src/cli.js serve --http --host 127.0.0.1",
-    "cli": "node src/cli.js",
-    "tools": "node src/cli.js tools",
-    "test": "node --test",
-    "inspect": "npx @modelcontextprotocol/inspector node src/index.js",
-    "init": "node scripts/init.js"
+    "build": "tsc",
+    "prepare": "tsc",
+    "typecheck": "tsc -p tsconfig.check.json",
+    "start": "node dist/index.js",
+    "start:http": "node dist/cli.js serve --http --host 127.0.0.1",
+    "cli": "node dist/cli.js",
+    "tools": "node dist/cli.js tools",
+    "test": "node --import tsx --test test/*.test.ts",
+    "inspect": "npx @modelcontextprotocol/inspector node dist/index.js",
+    "init": "tsx scripts/init.ts"
   },
   "engines": {
     "node": ">=20"
