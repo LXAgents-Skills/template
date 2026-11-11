@@ -64,3 +64,10 @@ separately.
 ### Task 1 — plan/typescript-migration
 
 Landed: this record and its row in `memory-index.md`.
+
+### Task 2 — build/dependencies
+
+Landed. `@modelcontextprotocol/sdk` 1.32.2, `express` 5.3.0, `zod` 4.6.7. Dev dependencies
+added: `typescript` 7.0.2, `@types/node` 26.6.6, `tsx` 4.23.15, `@types/express` 5.0.6. Nothing
+uses them yet; task 3 does. `npm audit`: 0 vulnerabilities. Version still `0.0.0` in
+`package.json` and the lockfile. 39 tests pass, still JavaScript.
