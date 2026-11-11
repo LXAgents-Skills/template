@@ -10,6 +10,12 @@ A new repository is created from it on GitHub, renamed with `npm run init`, and 
 its own `content/` — see [`wiki/guides/create-a-new-repository.md`](wiki/guides/create-a-new-repository.md).
 Everything outside this block is written so it stays true after `init` renames it; `init`
 deletes this block.
+
+**The template's version is `0.0.0`, permanently.** Never bump it; its release branch is always
+`release/0.0.0` and carries release notes only. Read
+[`.agents/rules/template-version.md`](.agents/rules/template-version.md) before touching
+`package.json`, the lockfile, a tag, or `wiki/logs/`. It overrides the version rule below,
+which is for the repositories made from the template.
 <!-- /template-only -->
 
 ## Two sets, two roles

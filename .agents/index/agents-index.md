@@ -15,4 +15,12 @@ description: Index of this repository's own rules - repository rules, tool IDs, 
 | [`../rules/automation-hub.md`](../rules/automation-hub.md) | The shape of `content/automation.md` and how to write a trigger condition. |
 | [`../rules/http-auth.md`](../rules/http-auth.md) | When `MCP_AUTH_TOKEN` is required, the localhost `Host` rule, and secrets. |
 
+<!-- template-only -->
+Template only — `npm run init` deletes this file and this table:
+
+| File | Purpose |
+|---|---|
+| [`../rules/template-version.md`](../rules/template-version.md) | The template stays at `0.0.0`: never bumped, release branch always `release/0.0.0`. |
+
+<!-- /template-only -->
 Any file added to or removed from `.agents/rules/` is reflected here in the same commit.

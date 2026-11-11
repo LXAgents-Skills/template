@@ -38,3 +38,4 @@ CONTENT_INSTRUCTIONS (src/instructions/from-content.js) ← content/**/*.md, rea
 | `src/cli.js` | `serve`, `tools`, `--help`, `--version`. |
 | `scripts/init.js` | Renaming a fresh copy of the template. |
 | `scripts/init/*.js` | The rename's pure parts: flags, identity defaults, text rewrites. |
+| `test/template-version.test.js` | Template only, deleted by `init`: the template's version stays `0.0.0`. |

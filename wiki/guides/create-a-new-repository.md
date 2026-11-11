@@ -42,7 +42,8 @@ The dry run prints what will change. The real run:
   `SERVER_SUMMARY`), `package.json` and `package-lock.json`, with the version reset to `0.0.0`;
 * replaces the old tool prefix, `org/repo` and server ID in every markdown file and the
   Dockerfile;
-* removes this guide and every `<!-- template-only -->` block;
+* removes this guide, the template's version rule and version test, and every
+  `<!-- template-only -->` block;
 * removes the template's own history: `.agents/memory/` tasks, decisions and state, and
   `wiki/logs/`, and resets their indexes;
 * boots the tool list and prints every new ID with its length.
@@ -64,4 +65,6 @@ cannot wipe the template's history.
 ## 5. Commit it on the usual branches
 
 The rename is the new repository's first plan: `plan/{slug}` for the record, `feat/…` for the
-rename and content, and `release/0.1.0` (or the version the owner picks) for the first release.
+rename and content, and `release/{version}` for the first release. The template is at `0.0.0`
+and never moves, so the new repository's first release is the first version it has; the owner
+picks it.

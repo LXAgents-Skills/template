@@ -61,3 +61,13 @@ Landed. `package.json`, `package-lock.json` (top level and `packages[""]`) at `0
 seen to fail with `package.json` at `0.1.0`. `scripts/init.js` lists it and
 `.agents/rules/template-version.md` (written in task 3) in `TEMPLATE_ONLY`, and the init
 end-to-end test asserts both are gone and the copy is at `0.0.0`. 39 tests pass.
+
+### Task 3 — docs/version-pin
+
+Landed. `.agents/rules/template-version.md` (what carries the version, the test that guards
+it, and what the `release/0.0.0` task contains), with a template-only row in
+`agents-index.md`. Template-only sentences in `AGENTS.md`, `README.md` and
+`wiki/information/overview.md`; the repository map lists the version test; the
+create-a-new-repository guide says `init` removes the rule and test and no longer suggests
+`release/0.1.0`. The init end-to-end test now also checks `agents-index.md` and that no page
+still names `template-version` after `init`. 39 tests pass.

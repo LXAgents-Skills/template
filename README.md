@@ -10,6 +10,7 @@ A read-only Skill MCP server: every markdown file in `content/` is served as its
 **This is the template for new Skill MCP repositories.** Create a repository from it on GitHub,
 then run `npm run init -- --org <org> --repo <repo>` — see
 [Create a new repository](wiki/guides/create-a-new-repository.md).
+The template itself stays at version `0.0.0`, so every new repository starts from there.
 <!-- /template-only -->
 
 ## Quick start
