@@ -38,7 +38,7 @@ npm run init -- --org <org> --repo <repo>
 
 The dry run prints what will change. The real run:
 
-* rewrites `src/identity.js` (`ORG_NAME`, `REPO_NAME`, `SERVER_ID`, `SERVER_TITLE`,
+* rewrites `src/identity.ts` (`ORG_NAME`, `REPO_NAME`, `SERVER_ID`, `SERVER_TITLE`,
   `SERVER_SUMMARY`), `package.json` and `package-lock.json`, with the version reset to `0.0.0`;
 * replaces the old tool prefix, `org/repo` and server ID in every markdown file and the
   Dockerfile;
@@ -46,7 +46,8 @@ The dry run prints what will change. The real run:
   `<!-- template-only -->` block;
 * removes the template's own history: `.agents/memory/` tasks, decisions and state, and
   `wiki/logs/`, and resets their indexes;
-* boots the tool list and prints every new ID with its length.
+* rebuilds `dist/` so the compiled server carries the new identity;
+* boots the tool list from `dist/` and prints every new ID with its length.
 
 Optional flags: `--server-id`, `--title`, `--summary`, `--keep-history`. By default the server
 ID is the org's first word and the repo (`LXAgents-Skills` + `security` → `lxagents-security`).

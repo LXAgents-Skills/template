@@ -14,7 +14,7 @@ without its folder or `.md`, lowercased, with `-` turned into `_`.
 
 An ID is at most 64 characters. If yours is longer, or another folder already has a file with
 the same name, pick a shorter or more specific filename, or give the file a base name in
-`OVERRIDE_BASES` (`src/instructions/naming.js`). Only the base is ever shortened. The full rule:
+`OVERRIDE_BASES` (`src/instructions/naming.ts`). Only the base is ever shortened. The full rule:
 [`.agents/rules/tool-ids.md`](../../.agents/rules/tool-ids.md).
 
 ## 2. Write it

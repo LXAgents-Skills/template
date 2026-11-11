@@ -4,7 +4,9 @@ The server is installed from a clone and run with Node. It is not installed from
 
 ## Requirements
 
-Node.js 20 or newer, and git. There is no build step.
+Node.js 20 or newer, and git. The server is TypeScript: `npm install` compiles it into `dist/`
+(through the `prepare` script), and every command below runs `dist/`. If you install with
+`--ignore-scripts`, run `npm run build` yourself.
 
 ## Clone and test
 
@@ -29,7 +31,7 @@ git clone https://github.com/LXAgents-Skills/template.git lxagents-template && c
   "mcpServers": {
     "lxagents-template": {
       "command": "node",
-      "args": ["src/index.js"],
+      "args": ["dist/index.js"],
       "cwd": "C:/path/to/lxagents-template"
     }
   }
@@ -39,7 +41,7 @@ git clone https://github.com/LXAgents-Skills/template.git lxagents-template && c
 Claude Code, from the clone (PowerShell):
 
 ```powershell
-claude mcp add lxagents-template -- node "$PWD\src\index.js"
+claude mcp add lxagents-template -- node "$PWD\dist\index.js"
 ```
 
 stdio needs no token and no environment variable.
@@ -64,5 +66,5 @@ Any other bind needs `MCP_AUTH_TOKEN`, at least 32 characters, and every client 
 ## After registering
 
 A client loads its servers when a session starts, so a server added mid-session stays absent
-until the session restarts. Check it with `node src/cli.js tools`, which prints the same list
+until the session restarts. Check it with `node dist/cli.js tools`, which prints the same list
 the client should see.

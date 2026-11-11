@@ -6,7 +6,7 @@ description: Adding, renaming, changing or removing a file in content/ - each is
 # Tool Authoring
 
 **Adding a markdown file to `content/` is adding a tool.** There is no tool module to write and
-no list to edit: `src/instructions/from-content.js` walks `content/` at boot and makes one tool
+no list to edit: `src/instructions/from-content.ts` walks `content/` at boot and makes one tool
 per `.md` file. A file that is not `.md` is not served.
 
 ## Adding a tool
@@ -53,6 +53,6 @@ and is never folded quietly into another change.
 ## The surface stays read-only
 
 No tool takes an argument, a verb, a credential or a network call, and no tool is registered
-anywhere but from `content/`. Tools are registered with `registerTool` in `src/server.js`, and
+anywhere but from `content/`. Tools are registered with `registerTool` in `src/server.ts`, and
 `listTools()` is the one list the CLI and the tests read. A hand-written tool beside the
 generator would be a second source of truth; do not add one.

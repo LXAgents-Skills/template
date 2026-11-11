@@ -27,7 +27,7 @@ description: Read this tool every session, first — it lists every tool and the
 ```
 
 * **Every other tool has exactly one row**, and every row names a tool that exists.
-  `test/server.test.js` fails otherwise, naming the missing or stale IDs.
+  `test/server.test.ts` fails otherwise, naming the missing or stale IDs.
 * A row starts with `- `, then the full ID in backticks, then ` — ` (space, em dash, space),
   then the condition. The test reads the first ID on each such line.
 * Group rows under `##` headings by when they fire, in the order work reaches them.

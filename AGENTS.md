@@ -1,7 +1,7 @@
 # AGENTS.md
 
-This repository is `LXAgents-Skills/template`: a Skill MCP server, Node.js 20+, ESM, no build
-step, that serves every markdown file in [`content/`](content/) read-only as its own tool.
+This repository is `LXAgents-Skills/template`: a Skill MCP server, Node.js 20+, TypeScript compiled
+to ESM in `dist/`, that serves every markdown file in [`content/`](content/) read-only as its own tool.
 Server ID `lxagents-template`, tool prefix `lxagents_skills_template_`.
 
 <!-- template-only -->
