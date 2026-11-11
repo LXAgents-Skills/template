@@ -5,6 +5,8 @@ description: Pinning LXAgents-Skills/template at version 0.0.0 forever, so every
 
 # Task: pin the template at 0.0.0
 
+**Status: done.**
+
 The template was released as `0.1.0` (`wiki/logs/0/1/0/`). The owner wants it to stay at
 `0.0.0` for good: it is never installed as a product, only copied, and every repository made
 from it starts its own version history from `0.0.0`.
@@ -30,10 +32,10 @@ from it starts its own version history from `0.0.0`.
 
 | # | Task | Branch | PR |
 |---|---|---|---|
-| 1 | This record | `plan/template-version` | |
-| 2 | Version files, the version test, `init` removes it | `feat/version-pin` | |
-| 3 | The rule, `AGENTS.md`, indexes, the guide | `docs/version-pin` | |
-| 4 | Rolling changelog, logs index, close this record | `release/0.0.0` | |
+| 1 | This record | `plan/template-version` | #6 |
+| 2 | Version files, the version test, `init` removes it | `feat/version-pin` | #7 |
+| 3 | The rule, `AGENTS.md`, indexes, the guide | `docs/version-pin` | #8 |
+| 4 | Rolling changelog, logs index, close this record | `release/0.0.0` | #9 |
 
 ## Rules set aside, by the owner's instruction
 
@@ -71,3 +73,9 @@ it, and what the `release/0.0.0` task contains), with a template-only row in
 create-a-new-repository guide says `init` removes the rule and test and no longer suggests
 `release/0.1.0`. The init end-to-end test now also checks `agents-index.md` and that no page
 still names `template-version` after `init`. 39 tests pass.
+
+### Task 4 — release/0.0.0
+
+Landed. `wiki/logs/0/0/0/CHANGELOG.md` is the template's one rolling changelog: a dated
+section for this change, then the former `0.1.0` notes. `wiki/logs/0/1/0/` removed; the
+`logs-index.md` row points at `0/0/0`. `package.json` untouched. PR column filled. Record done.
