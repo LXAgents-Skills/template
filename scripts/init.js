@@ -7,8 +7,9 @@
  *
  * Rewrites the identity in src/identity.js, package.json and package-lock.json, swaps the
  * old tool prefix, org/repo slug and server ID for the new ones in every markdown file and
- * the Dockerfile, clears the template's own history (task records, decisions, release logs),
- * and then boots the tool list to prove every ID is still valid.
+ * the Dockerfile, drops every template-only block and file, clears the template's own
+ * history (task records, decisions, release logs), and then boots the tool list to prove
+ * every ID is still valid.
  *
  * Run it once, on a clean working tree, and review `git diff` before committing.
  */
@@ -20,7 +21,7 @@ import { fileURLToPath } from "node:url";
 import * as current from "../src/identity.js";
 import { parseArgs } from "./init/args.js";
 import { identityFor } from "./init/identity.js";
-import { replaceAll, rewriteIdentity, rewritePackage } from "./init/rewrite.js";
+import { replaceAll, rewriteIdentity, rewritePackage, stripTemplateOnly } from "./init/rewrite.js";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
 
@@ -37,6 +38,9 @@ Options
 
 /** Paths the template's own history lives in. A new repository starts without them. */
 const HISTORY = [".agents/memory/tasks", ".agents/memory/decisions", ".agents/memory/state", "wiki/logs"];
+
+/** Files that are true only of the template itself. */
+const TEMPLATE_ONLY = ["wiki/guides/create-a-new-repository.md"];
 
 /** Fresh indexes for the history that was cleared. */
 const FRESH_INDEXES = {
@@ -113,6 +117,11 @@ function main(argv) {
   const changed = [];
   const removed = [];
 
+  for (const path of TEMPLATE_ONLY.map((p) => join(ROOT, p)).filter(existsSync)) {
+    if (!dryRun) rmSync(path, { force: true });
+    removed.push(relative(ROOT, path));
+  }
+
   if (!flags.keepHistory) {
     for (const path of HISTORY.map((p) => join(ROOT, p)).filter(existsSync)) {
       if (!dryRun) rmSync(path, { recursive: true, force: true });
@@ -132,7 +141,8 @@ function main(argv) {
         const name = `@${next.org.toLowerCase()}/${next.repo}`;
         lock.name = name;
         lock.version = "0.0.0";
-        if (lock.packages?.[""]) Object.assign(lock.packages[""], { name, version: "0.0.0" });
+        const bin = JSON.parse(rewritePackage(readFileSync(join(ROOT, "package.json"), "utf8"), next)).bin;
+        if (lock.packages?.[""]) Object.assign(lock.packages[""], { name, version: "0.0.0", bin });
         return `${JSON.stringify(lock, null, 2)}\n`;
       }, dryRun),
     );
@@ -142,7 +152,7 @@ function main(argv) {
     ...walk(ROOT, (name) => name.endsWith(".md")).filter((path) => !removed.some((gone) => path.startsWith(join(ROOT, gone)))),
     join(ROOT, "Dockerfile"),
   ].filter(existsSync);
-  for (const path of texts) changed.push(edit(path, (text) => replaceAll(text, pairs), dryRun));
+  for (const path of texts) changed.push(edit(path, (text) => stripTemplateOnly(replaceAll(text, pairs)), dryRun));
 
   const report = [
     `${dryRun ? "Would change" : "Changed"} ${current.ORG_NAME}/${current.REPO_NAME} -> ${next.org}/${next.repo}`,

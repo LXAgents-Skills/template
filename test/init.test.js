@@ -7,7 +7,7 @@ import { test } from "node:test";
 import { ROOT } from "../src/paths.js";
 import { parseArgs } from "../scripts/init/args.js";
 import { identityFor } from "../scripts/init/identity.js";
-import { replaceAll, rewriteIdentity, rewritePackage } from "../scripts/init/rewrite.js";
+import { replaceAll, rewriteIdentity, rewritePackage, stripTemplateOnly } from "../scripts/init/rewrite.js";
 
 test("flags parse to camelCase, and switches take no value", () => {
   assert.deepEqual(parseArgs(["--org", "A", "--server-id", "a-b", "--dry-run", "--keep-history"]), {
@@ -52,6 +52,11 @@ test("rewritePackage renames the package and resets its version", () => {
   assert.equal(pkg.repository.url, "git+https://github.com/Acme/docs.git");
 });
 
+test("stripTemplateOnly drops each marked block and its markers", () => {
+  const text = "a\n<!-- template-only -->\nonly\n<!-- /template-only -->\nb\n";
+  assert.equal(stripTemplateOnly(text), "a\nb\n");
+});
+
 test("replaceAll swaps whole strings in order", () => {
   assert.equal(replaceAll("a_x a_x b", [["a_", "c_"], ["b", "d"]]), "c_x c_x d");
 });
@@ -72,7 +77,15 @@ test("init turns a copy of the template into a new repository that passes its ow
     const hub = readFileSync(join(copy, "content/automation.md"), "utf8");
     assert.match(hub, /`acme_labs_field_notes_example_guide`/);
     assert.doesNotMatch(hub, /lxagents_skills_template_/);
+    assert.match(readFileSync(join(copy, "AGENTS.md"), "utf8"), /`Acme-Labs\/field-notes`/);
     assert.equal(existsSync(join(copy, ".agents/memory/tasks")), false, "the template's history is cleared");
+    assert.equal(existsSync(join(copy, "wiki/guides/create-a-new-repository.md")), false);
+    const lock = JSON.parse(readFileSync(join(copy, "package-lock.json"), "utf8"));
+    assert.deepEqual(Object.keys(lock.packages[""].bin), ["acme-field-notes", "acme-field-notes-server"]);
+    for (const page of ["AGENTS.md", "README.md", ".agents/index/project-wiki-index.md"]) {
+      const text = readFileSync(join(copy, page), "utf8");
+      assert.doesNotMatch(text, /template-only|create-a-new-repository/, `${page} keeps template-only text`);
+    }
 
     const suite = spawnSync(process.execPath, ["--test", "test/server.test.js", "test/naming.test.js"], {
       cwd: copy,
