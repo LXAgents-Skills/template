@@ -3,13 +3,13 @@ import { availableParallelism } from "node:os";
 /*
  * Every environment variable the server reads, read in one place.
  *
- * The one exception is `MCP_AUTH_TOKEN`, which `src/http/auth.js` reads at call time on
+ * The one exception is `MCP_AUTH_TOKEN`, which `src/http/auth.ts` reads at call time on
  * purpose: a secret captured once at load is whatever was set then, and the token
  * checks must see it change.
  */
 
 /** A comma-separated list, trimmed, with empty entries dropped. Unset is `[]`. */
-function splitList(raw) {
+function splitList(raw: string | undefined): string[] {
   if (!raw) return [];
   return raw
     .split(",")
@@ -29,10 +29,20 @@ function splitList(raw) {
  * constant: a container with two CPUs gets two workers and a laptop does not get
  * eight.
  */
-function workerCount(raw) {
+function workerCount(raw: string | undefined): number {
   const configured = Number.parseInt(raw ?? "", 10);
   if (Number.isInteger(configured) && configured >= 0) return configured;
   return availableParallelism();
+}
+
+/** The server's configuration, as `loadConfig` returns it. Frozen. */
+export interface Config {
+  readonly transport: string;
+  readonly port: number;
+  readonly host: string;
+  readonly local: boolean;
+  readonly workers: number;
+  readonly allowedHosts: readonly string[];
 }
 
 /**
@@ -40,11 +50,8 @@ function workerCount(raw) {
  *
  * `localhost`, any `127.x.x.x`, and `::1` with or without brackets. `0.0.0.0` and `::`
  * mean every interface, so they are not loopback; neither is an empty value.
- *
- * @param {string} host
- * @returns {boolean}
  */
-export function isLoopback(host) {
+export function isLoopback(host: string | null | undefined): boolean {
   const value = String(host ?? "").trim().toLowerCase();
   return (
     value === "localhost" ||
@@ -64,17 +71,15 @@ export function isLoopback(host) {
  *   container gets, but it is a decision nobody made, so it is made here, visibly.
  *   `HOST=127.0.0.1` is the way to take it back.
  * * `local` — whether `host` is loopback. A local HTTP server needs no token; see
- *   `src/http/auth.js`.
+ *   `src/http/auth.ts`.
  * * `workers` — `MCP_CLUSTER_WORKERS`, see `workerCount`.
  * * `allowedHosts` — `MCP_ALLOWED_HOSTS`. Unset, or nothing but commas and spaces,
  *   means no `Host` check is applied rather than one guessed at: a wrong allow-list
  *   silently refusing every request is a worse failure than an absent one, and this
  *   server serves public markdown either way, so the absence is reported on startup
  *   rather than papered over with a default list.
- *
- * @param {NodeJS.ProcessEnv} [env]
  */
-export function loadConfig(env = process.env) {
+export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
   const host = env.HOST || "0.0.0.0";
   return Object.freeze({
     transport: (env.MCP_TRANSPORT ?? "stdio").toLowerCase(),

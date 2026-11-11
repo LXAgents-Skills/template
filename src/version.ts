@@ -6,12 +6,13 @@ import { ROOT } from "./paths.js";
  * The package version. `package.json` is the only place it is written; this reads it once.
  * A server that cannot read it still starts, and says `0.0.0`.
  */
-function readVersion() {
+function readVersion(): string {
   try {
-    return JSON.parse(readFileSync(join(ROOT, "package.json"), "utf8")).version ?? "0.0.0";
+    const pkg = JSON.parse(readFileSync(join(ROOT, "package.json"), "utf8")) as { version?: string };
+    return pkg.version ?? "0.0.0";
   } catch {
     return "0.0.0";
   }
 }
 
-export const version = readVersion();
+export const version: string = readVersion();

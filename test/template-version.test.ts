@@ -11,7 +11,8 @@ import { ROOT } from "../src/paths.js";
 import { version } from "../src/version.js";
 
 const PINNED = "0.0.0";
-const read = (file) => JSON.parse(readFileSync(join(ROOT, file), "utf8"));
+const read = (file: string): { version: string; packages: Record<string, { version: string }> } =>
+  JSON.parse(readFileSync(join(ROOT, file), "utf8"));
 
 test("the template's version is pinned at 0.0.0", () => {
   const lock = read("package-lock.json");

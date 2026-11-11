@@ -1,4 +1,5 @@
 import cluster from "node:cluster";
+import type { Config } from "../config.js";
 import { SERVER_ID } from "../identity.js";
 import { version } from "../version.js";
 import { MIN_TOKEN_LENGTH, configuredToken, tokenProblem } from "./auth.js";
@@ -11,7 +12,7 @@ import { startWorker } from "./worker.js";
  * genuinely open — one per worker, from the processes that opened them. A primary that
  * logged a listening line of its own would be claiming a port it does not hold.
  */
-export function startPrimary(config) {
+export function startPrimary(config: Config): void {
   const { port } = config;
 
   // Fail closed, before anything is forked. HTTP without a token on anything but loopback
@@ -74,7 +75,7 @@ export function startPrimary(config) {
     forkWorker();
   });
 
-  function forkWorker() {
+  function forkWorker(): void {
     starts += 1;
     cluster.fork();
   }
@@ -90,14 +91,14 @@ export function startPrimary(config) {
    * a test that stops the server and then checks the port is refused must not race a
    * primary that exits while its workers are still answering.
    */
-  const shutdown = (signal) => {
+  const shutdown = (signal: NodeJS.Signals): void => {
     if (draining) {
       // A second signal means the operator has stopped waiting.
       process.exit(0);
     }
     draining = true;
 
-    const workers = Object.values(cluster.workers ?? {}).filter(Boolean);
+    const workers = Object.values(cluster.workers ?? {}).filter((worker) => worker !== undefined);
     process.stderr.write(`${SERVER_ID} ${version} ${signal}, draining ${workers.length} worker(s)\n`);
 
     // Unref'd: this timer is a backstop for a wedged worker, not a reason to keep the

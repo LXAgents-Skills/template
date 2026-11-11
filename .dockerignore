@@ -1,6 +1,9 @@
 # Installed inside the image, never copied in
 node_modules
 
+# Compiled inside the image, never copied in
+dist
+
 # Version control and CI
 .git
 .gitignore
@@ -15,6 +18,7 @@ AGENTS.md
 README.md
 Dockerfile
 .dockerignore
+tsconfig.check.json
 compose.yaml
 
 

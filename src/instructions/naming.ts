@@ -5,7 +5,7 @@ import { toolId } from "../identity.js";
  *
  *   {org}_{repo}_{base}
  *
- * `{org}_{repo}` is `TOOL_PREFIX` from `src/identity.js`. `{base}` is the filename: folder
+ * `{org}_{repo}` is `TOOL_PREFIX` from `src/identity.ts`. `{base}` is the filename: folder
  * dropped, `.md` dropped, lowercased, `-` turned into `_`. So `example/example-guide.md` in
  * `LXAgents-Skills/template` is `lxagents_skills_template_example_guide`.
  *
@@ -16,10 +16,10 @@ import { toolId } from "../identity.js";
  * The longest ID this server publishes. The protocol allows 128, but several clients cap a
  * tool name at 64, so every ID is held to 64 at boot.
  */
-export const MAX_ID_LENGTH = 64;
+export const MAX_ID_LENGTH: number = 64;
 
 /** What an MCP client accepts as a tool name, with the 64-character cap applied. */
-export const TOOL_NAME = /^[a-z][a-z0-9_]*$/;
+export const TOOL_NAME: RegExp = /^[a-z][a-z0-9_]*$/;
 
 /**
  * Base names that do not survive mechanical derivation, keyed by set-relative path.
@@ -31,36 +31,28 @@ export const TOOL_NAME = /^[a-z][a-z0-9_]*$/;
  *
  * Example: `"references/javascript-typescript-react-web-frontend-security.md": "js_ts_react_web_frontend_security"`.
  */
-export const OVERRIDE_BASES = Object.freeze({});
+export const OVERRIDE_BASES: Readonly<Record<string, string>> = Object.freeze({});
 
 /** The base name a path derives on its own. */
-export function derivedBase(relativePath) {
+export function derivedBase(relativePath: string): string {
   return relativePath
     .split("/")
-    .pop()
+    .pop()!
     .replace(/\.md$/, "")
     .toLowerCase()
     .replace(/-/g, "_");
 }
 
-/**
- * The tool ID for a set-relative path.
- *
- * @param {string} relativePath
- * @param {Readonly<Record<string, string>>} [overrides]
- * @returns {string}
- */
-export function toolNameFor(relativePath, overrides = OVERRIDE_BASES) {
+/** The tool ID for a set-relative path. */
+export function toolNameFor(
+  relativePath: string,
+  overrides: Readonly<Record<string, string>> = OVERRIDE_BASES,
+): string {
   return toolId(overrides[relativePath] ?? derivedBase(relativePath));
 }
 
-/**
- * Why `name` cannot be published, or `null` when it can.
- *
- * @param {string} name
- * @returns {string | null}
- */
-export function nameProblem(name) {
+/** Why `name` cannot be published, or `null` when it can. */
+export function nameProblem(name: string): string | null {
   if (!TOOL_NAME.test(name)) {
     return `"${name}" is not a valid tool name (lowercase letters, digits and underscores, starting with a letter)`;
   }

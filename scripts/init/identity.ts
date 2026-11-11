@@ -3,12 +3,30 @@
  */
 
 /** `my-repo` is `My Repo`. */
-function titleCase(name) {
+function titleCase(name: string): string {
   return name
     .split(/[^A-Za-z0-9]+/)
     .filter(Boolean)
-    .map((word) => word[0].toUpperCase() + word.slice(1))
+    .map((word) => word[0]!.toUpperCase() + word.slice(1))
     .join(" ");
+}
+
+/** The flags `identityFor` reads. `org` and `repo` are required, and checked at run time. */
+export interface IdentityFlags {
+  org?: string;
+  repo?: string;
+  serverId?: string;
+  title?: string;
+  summary?: string;
+}
+
+/** A new repository's identity: what `init` writes into `src/identity.ts` and `package.json`. */
+export interface Identity {
+  org: string;
+  repo: string;
+  serverId: string;
+  title: string;
+  summary: string;
 }
 
 /**
@@ -16,16 +34,14 @@ function titleCase(name) {
  *
  * `serverId` defaults to the first word of the org and the repo: `LXAgents-Skills` and
  * `security` give `lxagents-security`, the way the existing servers are named.
- *
- * @param {{ org: string, repo: string, serverId?: string, title?: string, summary?: string }} flags
  */
-export function identityFor({ org, repo, serverId, title, summary }) {
+export function identityFor({ org, repo, serverId, title, summary }: IdentityFlags): Identity {
   if (!org || !repo) throw new Error("Both --org and --repo are required.");
   if (!/^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(org) || !/^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(repo)) {
     throw new Error("--org and --repo take GitHub names: letters, digits, '.', '_' and '-'.");
   }
 
-  const brand = org.split(/[^A-Za-z0-9]+/)[0];
+  const brand = org.split(/[^A-Za-z0-9]+/)[0]!;
   return {
     org,
     repo,

@@ -71,3 +71,37 @@ Landed. `@modelcontextprotocol/sdk` 1.32.2, `express` 5.3.0, `zod` 4.6.7. Dev de
 added: `typescript` 7.0.2, `@types/node` 26.6.6, `tsx` 4.23.15, `@types/express` 5.0.6. Nothing
 uses them yet; task 3 does. `npm audit`: 0 vulnerabilities. Version still `0.0.0` in
 `package.json` and the lockfile. 39 tests pass, still JavaScript.
+
+### Task 3 — refactor/typescript
+
+Landed. Every `.js` in `src/`, `test/` and `scripts/` is now `.ts` (`git mv`, so history
+follows). Types added: `Config` (`src/config.ts`), `ServerOptions` and `ToolSummary`
+(`src/server.ts`), `ContentInstruction` and `ContentInstructions` (handlers typed as returning
+the SDK's `CallToolResult`), `AppOptions` (`src/http/app.ts`), `Flags`, `IdentityFlags` and
+`Identity` (`scripts/init/`). Express handlers use express's own types. No logic changed, and
+neither did any SDK call or tool ID. `TOOL_PREFIX` keeps no annotation, because the init test
+reads `src/identity.ts` as text.
+
+- `tsconfig.json` builds `src/` to `dist/` (ES2022, NodeNext, strict, `types: ["node"]`, source
+  maps). `tsconfig.check.json` type-checks `src/`, `test/` and `scripts/` without emitting;
+  `npm run typecheck` runs it.
+- `package.json`: `main` and `bin` on `dist/`, `files` ships `dist/` instead of `src/`;
+  `build` and `prepare` are `tsc`; `start`, `start:http`, `cli`, `tools`, `inspect` run `dist/`;
+  `test` is `node --import tsx --test test/*.test.ts`; `init` is `tsx scripts/init.ts`.
+- `dist/` is git-ignored and docker-ignored.
+- `init` rewrites `src/identity.ts`, writes `dist/` bins into `package.json` and the lockfile,
+  rebuilds `dist/` with the local `tsc`, then boots `dist/cli.js tools`. `TEMPLATE_ONLY` names
+  `test/template-version.test.ts`.
+- The init end-to-end test now runs `init` through `tsx`, checks that the rebuilt `dist/`
+  lists tools under the new prefix, and asserts *any* new-prefix ID in the hub instead of
+  `example_guide`. That fixes one of the two gaps the agentic bootstrap reported; the other,
+  the repository map row, is task 4.
+- Dockerfile: a build stage runs `npm ci --ignore-scripts` and `npm run build`, and the runtime
+  stage installs with `--omit=dev` and copies `dist/` in. Entry point `node dist/index.js`.
+- The HTTP tests spawn `src/index.ts` through `tsx`, so `npm test` needs no prior build.
+
+Checks: `npm run build` and `npm run typecheck` clean; 38 tests pass (the old count of 39
+included `test/helpers.js`, which `node --test` ran as a test file); stdio initialize,
+`tools/list` and `tools/call` answered from `dist/index.js`; HTTP with two workers on
+127.0.0.1 answered `/healthz` and `tools/list`; on 0.0.0.0 without a token it exits 1.
+`npm audit`: 0 vulnerabilities.

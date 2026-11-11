@@ -16,23 +16,27 @@ const INSTRUCTIONS = [
   "Call no other tool until its condition is true. No tool takes an argument.",
 ].join(" ");
 
-/**
- * The registered tools, as name and description. The CLI prints this, so the two surfaces
- * cannot drift apart.
- *
- * @returns {{ name: string, description: string }[]}
- */
-export function listTools() {
-  return CONTENT_INSTRUCTIONS.map(({ config }) => ({ name: config.name, description: config.description }));
+/** A registered tool, as the CLI prints it. */
+export interface ToolSummary {
+  name: string;
+  description: string;
 }
 
 /**
- * A fresh server. One per connection, because `McpServer` holds per-connection state.
- *
- * @param {{ version: string }} options
- * @returns {McpServer}
+ * The registered tools, as name and description. The CLI prints this, so the two surfaces
+ * cannot drift apart.
  */
-export function createServer({ version }) {
+export function listTools(): ToolSummary[] {
+  return CONTENT_INSTRUCTIONS.map(({ config }) => ({ name: config.name, description: config.description }));
+}
+
+/** What `createServer` needs to know that is not fixed at build time. */
+export interface ServerOptions {
+  version: string;
+}
+
+/** A fresh server. One per connection, because `McpServer` holds per-connection state. */
+export function createServer({ version }: ServerOptions): McpServer {
   const server = new McpServer(
     { name: SERVER_ID, title: SERVER_TITLE, version },
     { instructions: INSTRUCTIONS },
