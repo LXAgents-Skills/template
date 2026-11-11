@@ -1,0 +1,66 @@
+---
+name: memory-tasks-typescript-migration
+description: Migrating LXAgents-Skills/template from JavaScript to TypeScript - latest dependencies, strict tsconfig, dist/ built on install, version still 0.0.0.
+---
+
+# Task: migrate the template to TypeScript
+
+**Status: in progress.**
+
+The owner asked every Node.js repository in the organization to move to TypeScript with the
+same checklist: latest dependencies and a clean `npm audit`; a strict NodeNext `tsconfig.json`
+building `src/` into `dist/`; every `.js` in `src/` and `test/` renamed to `.ts` and typed,
+with the logic unchanged; `main`, `bin` and `start` pointing at `dist/`; a `build` script; tests
+run through `tsx`. This record covers the template only. Other repositories are migrated
+separately.
+
+## What changes
+
+- `package.json`: dependencies at their latest; `typescript`, `@types/node`, `tsx` and
+  `@types/express` as dev dependencies; `main`, `bin`, `start`, `start:http`, `cli`, `tools`,
+  `inspect` on `dist/`; `build: tsc`; `prepare: tsc`; `test: node --import tsx --test test/*.test.ts`;
+  `init: tsx scripts/init.ts`.
+- `tsconfig.json` (build: `src/` to `dist/`, `strict`) and `tsconfig.check.json` (type-checks
+  `src/`, `test/` and `scripts/` without emitting).
+- `src/`, `test/` and `scripts/` become `.ts`. Imports keep their `.js` extensions, as NodeNext
+  requires.
+- `dist/` is ignored by git and built by `prepare` on `npm install`, so clone + install still
+  yields a runnable server.
+- `npm run init` rewrites `src/identity.ts`, rebuilds `dist/`, then boots the tool list from it.
+- The Dockerfile builds in one stage and runs `dist/` in a second, without dev dependencies.
+
+## What does not change
+
+- Version `0.0.0`, guarded by `test/template-version.test.ts`. The release branch is
+  `release/0.0.0` with release notes only.
+- Tool IDs, the ID rule, the tool surface, the SDK calls, HTTP auth, the stdout ban.
+- Other repositories.
+
+## The plan
+
+| # | Task | Branch | PR |
+|---|---|---|---|
+| 1 | This record | `plan/typescript-migration` | |
+| 2 | Latest dependencies, clean audit | `build/dependencies` | |
+| 3 | tsconfig, conversion, scripts, init, Docker | `refactor/typescript` | |
+| 4 | Rules, README, wiki, agent wiki | `docs/typescript` | |
+| 5 | Changelog, close this record | `release/0.0.0` | |
+
+## Rules set aside, by the owner's instruction
+
+- **No build step** (`.agents/rules/repository.md`). The owner asked for `tsc` to `dist/`.
+  The rule is rewritten in task 4 to describe the build instead.
+
+## Decisions taken without the owner
+
+- `dist/` is not committed. `prepare` builds it on `npm install`, which the clone install
+  already runs; a committed `dist/` would drift from `src/`.
+- `scripts/` is converted too and run through `tsx`, because `init` imports `src/identity`,
+  which is now TypeScript. It is type-checked by `tsconfig.check.json`, not built.
+- Tests spawn the server from source through `tsx`, so `npm test` does not need a prior build.
+
+## Progress
+
+### Task 1 — plan/typescript-migration
+
+Landed: this record and its row in `memory-index.md`.
