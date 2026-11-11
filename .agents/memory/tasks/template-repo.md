@@ -64,3 +64,15 @@ template keeps them: the bijection, the ID rule, no arguments, byte-for-byte con
 listing every tool once, the naming errors on throwaway sets, the config, and HTTP auth
 (token off loopback, localhost `Host` on loopback, the real entry point refusing `0.0.0.0`
 without a token). 31 tests pass.
+
+### Task 3 — feat/init-script
+
+Landed. `npm run init -- --org <org> --repo <repo>` (`scripts/init.js`) rewrites
+`src/identity.js`, `package.json` and `package-lock.json` (version reset to `0.0.0`), swaps the
+old tool prefix, `org/repo` slug and server ID in every markdown file and the Dockerfile,
+clears the template's history (`.agents/memory/{tasks,decisions,state}`, `wiki/logs`) with
+fresh indexes, and boots the tool list so an ID pushed past 64 characters fails by name.
+`--dry-run`, `--keep-history`, `--server-id`, `--title`, `--summary`. It refuses to run when
+`origin` is the template itself unless `--force` is passed. The pure parts live in
+`scripts/init/`. A test copies the repository, runs init, and runs the copy's own surface
+tests. 37 tests pass.
