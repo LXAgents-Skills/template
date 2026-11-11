@@ -9,6 +9,9 @@ and the condition that activates it.
 It is also the starting point for every new Skill MCP repository in the organization:
 create a repository from it on GitHub, run `npm run init`, and replace `content/`. See
 [Create a new repository](../guides/create-a-new-repository.md).
+
+The template's own version is always `0.0.0`. It is copied, never released, so each new
+repository starts its version history from zero.
 <!-- /template-only -->
 
 | Surface | How |
