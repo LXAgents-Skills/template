@@ -1,6 +1,6 @@
 {
   "name": "@lxagents-skills/template",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "description": "Template for LXAgents Skill MCP servers: every markdown file in content/ is served read-only as its own tool.",
   "type": "module",

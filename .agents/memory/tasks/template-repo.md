@@ -17,11 +17,11 @@ Neither reference repository is changed by this task.
 
 | # | Task | Branch | PR |
 |---|---|---|---|
-| 1 | This record and the ignore rules | `plan/template-repo` | |
-| 2 | The Skill MCP server, `content/automation.md` hub, an example tool, tests, Docker | `feat/server` | |
-| 3 | `npm run init` renames a fresh copy: org, repo, prefix, package, hub | `feat/init-script` | |
-| 4 | `AGENTS.md`, `.agents/` rules and indexes, `wiki/` guides, README | `docs/authoring-guide` | |
-| 5 | Version and changelog | `release/0.1.0` | |
+| 1 | This record and the ignore rules | `plan/template-repo` | #1 |
+| 2 | The Skill MCP server, `content/automation.md` hub, an example tool, tests, Docker | `feat/server` | #2 |
+| 3 | `npm run init` renames a fresh copy: org, repo, prefix, package, hub | `feat/init-script` | #3 |
+| 4 | `AGENTS.md`, `.agents/` rules and indexes, `wiki/` guides, README | `docs/authoring-guide` | #4 |
+| 5 | Version and changelog | `release/0.1.0` | #5 |
 
 ## Conventions carried into the template
 
@@ -91,3 +91,11 @@ install by git clone (PowerShell and bash), env, Docker, overview, architecture;
 `<!-- template-only -->` block and the create-a-new-repository guide, and it rewrites the
 lockfile's `bin`. Text true only of the template lives in those blocks, so a renamed copy has
 no stale references to the template. 38 tests pass.
+
+### Task 5 — release/0.1.0
+
+Landed. `package.json` and the lockfile at `0.1.0`, `wiki/logs/0/1/0/CHANGELOG.md`, its row in
+`logs-index.md`, and the PR column above. No git tag. **The record is done.**
+
+Left for the owner: tick **Template repository** in the repository's GitHub settings, and
+delete the merged branches.
