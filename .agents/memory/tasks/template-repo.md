@@ -76,3 +76,18 @@ fresh indexes, and boots the tool list so an ID pushed past 64 characters fails 
 `origin` is the template itself unless `--force` is passed. The pure parts live in
 `scripts/init/`. A test copies the repository, runs init, and runs the copy's own surface
 tests. 37 tests pass.
+
+### Task 4 — docs/authoring-guide
+
+Landed. `AGENTS.md` (consumer of the shared set through `lxagents-shared-instruction`, with the
+session-start sequence, gates, and this repository's trigger rows), `.claude/CLAUDE.md`
+importing it, the five `.agents/index/` routers, and four rules: `tool-ids.md` (how to build
+an ID, the 64-character budget, when and how to override the base), `tool-authoring.md`,
+`automation-hub.md` (row shape and how to write a condition) and `http-auth.md`. Agent map in
+`.agents/wiki/context/repository-map.md`. Human pages: create a new repository, add a tool,
+install by git clone (PowerShell and bash), env, Docker, overview, architecture; README.
+
+`init` gained two things in this task, in their own commit: it drops every
+`<!-- template-only -->` block and the create-a-new-repository guide, and it rewrites the
+lockfile's `bin`. Text true only of the template lives in those blocks, so a renamed copy has
+no stale references to the template. 38 tests pass.
