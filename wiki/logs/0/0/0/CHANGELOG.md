@@ -1,11 +1,37 @@
-# 0.1.0
+# 0.0.0
 
-**Released:** 2026-11-11
+The template's only version. It is copied, never released, so it stays at `0.0.0` and every
+repository made from it starts its own history there. Each change to the template adds a dated
+section below, newest first.
 
-The first release. The template is a working Skill MCP server, and the starting point for every
+## 2026-11-11 — Pin the version at 0.0.0
+
+### Added
+
+- `.agents/rules/template-version.md` (template only): the version is `0.0.0` for good, and a
+  template release is always `release/0.0.0` with release notes only.
+- `test/template-version.test.js` (template only): fails if `package.json`, the lockfile or
+  the version the server reports leaves `0.0.0`.
+
+### Modified
+
+- `package.json`, `package-lock.json`: `0.1.0` to `0.0.0`. `--version`, `/healthz` and the
+  MCP handshake report `0.0.0`.
+- `npm run init` deletes the version rule and test, so a new repository can release normally.
+- `AGENTS.md`, `README.md`, the overview, the agents index, the repository map and the
+  create-a-new-repository guide say the template stays at `0.0.0`.
+
+### Deleted
+
+- `wiki/logs/0/1/0/`. Its notes are the next section. No tag or package was ever published
+  for `0.1.0`.
+
+## 2026-11-11 — The first template (briefly numbered 0.1.0)
+
+The first version. The template is a working Skill MCP server, and the starting point for every
 new Skill MCP repository: create a repository from it, run `npm run init`, replace `content/`.
 
-## Added
+### Added
 
 - A read-only Skill MCP server over stdio and HTTP, with the layout of
   `LXAgents-Skills/security`: `config`, `run`, `stdio`, `http/` and a CLI. Tools are registered
@@ -32,7 +58,7 @@ new Skill MCP repository: create a repository from it, run `npm run init`, repla
   a tool, installing by git clone, environment and Docker.
 - A single-stage `node:22-alpine` Dockerfile.
 
-## For consumers
+### For consumers
 
 Install by git clone — see `wiki/guides/install-by-git-clone.md`. `package.json` is `private`;
 nothing is published to npm.
