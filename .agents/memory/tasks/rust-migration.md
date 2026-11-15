@@ -5,7 +5,7 @@ description: Migrating LXAgents-Skills/template from TypeScript to Rust - the of
 
 # Task: migrate the template to Rust
 
-**Status: in progress.**
+**Status: done.**
 
 The owner asked every repository in the organization to move from TypeScript to Rust, using the
 official Model Context Protocol Rust SDK (`modelcontextprotocol/rust-sdk`, crate `rmcp`) and
@@ -101,10 +101,10 @@ Removed: `package.json`, `package-lock.json`, `tsconfig.json`, `tsconfig.check.j
 
 | # | Task | Branch | Files / areas | PR |
 |---|---|---|---|---|
-| 1 | This record | `plan/rust-migration` | `.agents/memory/tasks/rust-migration.md`, `memory-index.md` | |
-| 2 | Rust server, tests, xtask init, Docker; TypeScript removed | `refactor/rust` | `Cargo.*`, `build.rs`, `src/`, `tests/`, `xtask/`, `.cargo/`, `Dockerfile`, `.dockerignore`, `.gitignore` | |
-| 3 | Rules, README, AGENTS.md, both wikis | `docs/rust` | `AGENTS.md`, `README.md`, `.agents/rules/`, `.agents/wiki/`, `wiki/` | |
-| 4 | Changelog, close this record | `release/0.0.0` | `wiki/logs/0/0/0/CHANGELOG.md`, this record | |
+| 1 | This record | `plan/rust-migration` | `.agents/memory/tasks/rust-migration.md`, `memory-index.md` | #15 |
+| 2 | Rust server, tests, xtask init, Docker; TypeScript removed | `refactor/rust` | `Cargo.*`, `build.rs`, `src/`, `tests/`, `xtask/`, `.cargo/`, `Dockerfile`, `.dockerignore`, `.gitignore` | #16 |
+| 3 | Rules, README, AGENTS.md, both wikis | `docs/rust` | `AGENTS.md`, `README.md`, `.agents/rules/`, `.agents/wiki/`, `wiki/` | #17 |
+| 4 | Changelog, close this record | `release/0.0.0` | `wiki/logs/0/0/0/CHANGELOG.md`, this record | #18 |
 
 Each branch stacks on the one before it. Each pull request is rebased onto `master` and merged
 in order, and each branch is deleted as it merges where the platform allows it.
@@ -207,3 +207,12 @@ carriers. The install guide registers `target/release/lxagents-template` with no
 Docker, environment, architecture, overview, add-a-tool and create-a-new-repository pages,
 `README.md`, `AGENTS.md` and the repository map describe the Rust build. `cargo test --workspace`
 passes, the init end-to-end test included, so every template-only block still strips.
+
+### Task 4 — release/0.0.0
+
+Landed. A dated "Migrate to Rust" section at the top of `wiki/logs/0/0/0/CHANGELOG.md`.
+`Cargo.toml`, `Cargo.lock` and tags untouched. PR column filled. Record done.
+
+Left open: the Docker image is unbuilt here (no daemon); `cargo audit` is not installed, so no
+advisory scan was run; GitHub's "Template repository" box and deleting merged branches are the
+owner's.
