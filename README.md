@@ -8,20 +8,26 @@ A read-only Skill MCP server: every markdown file in `content/` is served as its
 
 <!-- template-only -->
 **This is the template for new Skill MCP repositories.** Create a repository from it on GitHub,
-then run `npm run init -- --org <org> --repo <repo>` — see
+then run `cargo xtask init -- --org <org> --repo <repo>` — see
 [Create a new repository](wiki/guides/create-a-new-repository.md).
 The template itself stays at version `0.0.0`, so every new repository starts from there.
 <!-- /template-only -->
 
 ## Quick start
 
-```powershell
-git clone https://github.com/LXAgents-Skills/template.git lxagents-template; cd lxagents-template; npm install; npm test
-npm run tools
-npm start
+Rust 1.88 or newer:
+
+```bash
+git clone https://github.com/LXAgents-Skills/template.git lxagents-template && cd lxagents-template
+cargo test --workspace
+cargo build --release
+target/release/lxagents-template tools
+target/release/lxagents-template
 ```
 
-stdio needs no token. `npm run start:http` serves HTTP on `127.0.0.1:3000`, also without one.
+The last line serves over stdio, which needs no token.
+`target/release/lxagents-template serve --http --host 127.0.0.1` serves HTTP on
+`127.0.0.1:3000`, also without one.
 HTTP on any other address needs `MCP_AUTH_TOKEN`.
 
 ## Tools

@@ -13,8 +13,8 @@ Every file in `content/` is served as a tool, and its ID is derived, never chose
 
 | Part | Comes from | Example |
 |---|---|---|
-| `{org}` | `ORG_NAME` in `src/identity.ts`, through `idPart()` | `LXAgents-Skills` → `lxagents_skills` |
-| `{repo}` | `REPO_NAME` in `src/identity.ts`, through `idPart()` | `shared-instruction` → `shared_instruction` |
+| `{org}` | `ORG_NAME` in `src/identity.rs`, through `id_part()` | `LXAgents-Skills` → `lxagents_skills` |
+| `{repo}` | `REPO_NAME` in `src/identity.rs`, through `id_part()` | `shared-instruction` → `shared_instruction` |
 | `{base}` | The file's own name, or its `OVERRIDE_BASES` entry | `git/branching-strategy.md` → `branching_strategy` |
 
 `{org}_{repo}` is `TOOL_PREFIX`. It is the same for every tool on the server, and it exists
@@ -27,7 +27,7 @@ so that two servers connected to one client never collide on a bare name like `a
 3. Lowercase.
 4. Turn every `-` into `_`.
 
-`idPart()` does the same for the org and repo, and also turns any other run of characters
+`id_part()` does the same for the org and repo, and also turns any other run of characters
 that is not a letter or digit into one `_`.
 
 ## The four rules
@@ -53,18 +53,18 @@ The base gets whatever the prefix leaves: `64 - len(TOOL_PREFIX) - 1`.
 | `lxagents_skills_security` | 24 | 39 |
 | `lxagents_skills_shared_instruction` | 34 | 29 |
 
-Check before you name a file: `npm run tools` prints every ID and its length.
+Check before you name a file: `cargo run -- tools` prints every ID and its length.
 
 ## Overrides
 
-`OVERRIDE_BASES` in `src/instructions/naming.ts` maps a set-relative path to a base name.
-The prefix is added by `toolId()`, so an entry is a base only:
+`OVERRIDE_BASES` in `src/instructions/naming.rs` maps a set-relative path to a base name.
+The prefix is added by `tool_id()`, so an entry is a base only:
 
-```js
-export const OVERRIDE_BASES = Object.freeze({
-  "references/javascript-typescript-react-web-frontend-security.md": "js_ts_react_web_frontend_security",
-  "skills/github/api.md": "github_api",
-});
+```rust
+pub const OVERRIDE_BASES: &[(&str, &str)] = &[
+    ("references/javascript-typescript-react-web-frontend-security.md", "js_ts_react_web_frontend_security"),
+    ("skills/github/api.md", "github_api"),
+];
 ```
 
 * Prefer renaming the file. An override is for when the filename has to stay — it is
@@ -79,6 +79,6 @@ export const OVERRIDE_BASES = Object.freeze({
 
 | Check | Where |
 |---|---|
-| Valid characters, 64-character cap, collisions, stale overrides | At boot, `src/instructions/from-content.ts` |
-| Every ID starts with `TOOL_PREFIX_` and matches the derivation | `test/server.test.ts` |
-| The derivation itself, overrides, and each refusal | `test/naming.test.ts` |
+| Valid characters, 64-character cap, collisions, stale overrides | At boot, `src/instructions/surface.rs` |
+| Every ID starts with `TOOL_PREFIX_` and matches the derivation | `tests/server.rs` |
+| The derivation itself, overrides, and each refusal | `tests/naming.rs` |

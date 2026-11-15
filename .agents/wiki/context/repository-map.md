@@ -7,44 +7,47 @@ description: Every source file in this repository and the one thing it is respon
 
 ## Flow
 
-Source files are listed. Each compiles to the same path under `dist/` with `.js`, and `dist/` is
-what runs.
-
 ```
-src/index.ts ─ loadConfig() ─ run()
-                                ├─ stdio  → src/stdio.ts ─ createServer()
-                                └─ http   → src/http/primary.ts ─ fork ─ src/http/worker.ts ─ createApp() ─ createServer()
+build.rs ─ content/**/*.md → $OUT_DIR/content.rs ─ src/instructions/embedded.rs (FILES)
 
-createServer()  (src/server.ts) ─ registerTool() for each entry in CONTENT_INSTRUCTIONS
-CONTENT_INSTRUCTIONS (src/instructions/from-content.ts) ← content/**/*.md, read once at import
+src/main.rs ─ cli::parse() ─ Config::from_lookup() ─ instructions::surface() ─ SkillServer::new()
+                                                     ├─ stdio → src/stdio.rs ─ rmcp stdio()
+                                                     └─ http  → src/http/mod.rs ─ app::router() ─ axum::serve()
+
+app::router()  (src/http/app.rs) ─ host check ─ bearer check ─ /healthz | POST /mcp → require_json → rmcp StreamableHttpService
+SkillServer    (src/server.rs)   ─ ServerHandler: get_info, list_tools, call_tool over the surface
+surface()      (src/instructions/mod.rs) ← surface::build(FILES, OVERRIDE_BASES), checked once
 ```
 
 ## Files
 
 | File | Responsible for |
 |---|---|
-| `src/identity.ts` | Naming the server: org, repo, server ID, title, summary; derives `TOOL_PREFIX` and `toolId()`. |
-| `src/paths.ts` | `ROOT` and `CONTENT_DIR`. |
-| `src/version.ts` | Reading the version from `package.json`. |
-| `src/config.ts` | Reading every environment variable into one frozen object. |
-| `src/instructions/frontmatter.ts` | Parsing single-line frontmatter fields. |
-| `src/instructions/naming.ts` | The tool ID rule: base derivation, `OVERRIDE_BASES`, the 64-character cap. |
-| `src/instructions/from-content.ts` | Building the tool list from `content/` and refusing a malformed set. |
-| `src/server.ts` | Registering the tools on a fresh `McpServer`; `listTools()`. |
-| `src/run.ts` | Choosing the transport. |
-| `src/stdio.ts` | The stdio transport. |
-| `src/http/app.ts` | The express app: `Host` check, token check, `/mcp`, `/healthz`, errors. |
-| `src/http/auth.ts` | The bearer token: reading it, judging it, checking a request. |
-| `src/http/primary.ts` | Refusing to start without a required token; forking workers. |
-| `src/http/worker.ts` | Listening, and draining on shutdown. |
-| `src/http/rpc-error.ts` | The JSON-RPC error envelope. |
-| `src/cli.ts` | `serve`, `tools`, `--help`, `--version`. |
-| `scripts/init.ts` | Renaming a fresh copy of the template. |
-| `scripts/init/*.ts` | The rename's pure parts: flags, identity defaults, text rewrites. |
-| `tsconfig.json` | Compiling `src/` to `dist/`: ES2022, NodeNext, `strict`. |
-| `tsconfig.check.json` | Type-checking `src/`, `test/` and `scripts/` without output. |
+| `build.rs` | Embedding every `.md` under `content/`, and rerunning when it changes. |
+| `src/main.rs` | Carrying out the parsed command: the runtime, the transport, exit codes. |
+| `src/lib.rs` | Declaring the modules, so `tests/` and `xtask` can reach them. |
+| `src/cli.rs` | Parsing `serve`, `tools`, `--help`, `--version`; the help text. |
+| `src/identity.rs` | Naming the server: org, repo, server ID, title, summary; derives `TOOL_PREFIX` and `tool_id()`. |
+| `src/version.rs` | The version, compiled in from `Cargo.toml`. |
+| `src/config.rs` | Reading every environment variable into one `Config`. |
+| `src/instructions/embedded.rs` | The set as `build.rs` embedded it. |
+| `src/instructions/frontmatter.rs` | Parsing single-line frontmatter fields. |
+| `src/instructions/naming.rs` | The tool ID rule: base derivation, `OVERRIDE_BASES`, the 64-character cap. |
+| `src/instructions/surface.rs` | Building the tool list and refusing a malformed set. |
+| `src/instructions/mod.rs` | The checked surface, built once. |
+| `src/server.rs` | The `rmcp` `ServerHandler`; `list_tools()` for the CLI. |
+| `src/stdio.rs` | The stdio transport. |
+| `src/http/mod.rs` | Refusing to start without a required token; binding; startup lines; draining on a signal. |
+| `src/http/app.rs` | The axum router: routes, body check, the stateless `rmcp` service, 404 and 405. |
+| `src/http/auth.rs` | The bearer token: reading it, judging it, checking a request in constant time. |
+| `src/http/host.rs` | The `Host` allow-list. |
+| `src/http/rpc_error.rs` | The JSON-RPC error envelope. |
+| `xtask/src/main.rs` | `cargo xtask init`: renaming a fresh copy of the template, then proving its tools. |
+| `xtask/src/{args,identity,rewrite}.rs` | The rename's pure parts: flags, identity defaults, text rewrites. |
+| `tests/*.rs` | Integration tests: naming, config, server, stdio, http. |
+| `xtask/tests/init.rs` | `init` end to end, on a temporary copy. |
 
 <!-- template-only -->
-Template only, deleted by `init`: `test/template-version.test.ts`, which keeps the template's
+Template only, deleted by `init`: `tests/template_version.rs`, which keeps the template's
 version at `0.0.0`.
 <!-- /template-only -->

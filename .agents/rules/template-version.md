@@ -5,7 +5,7 @@ description: The template's version is 0.0.0 for good - it is copied, never rele
 
 # Template Version
 
-Template only: `npm run init` deletes this file. A repository made from the template versions
+Template only: `cargo xtask init` deletes this file. A repository made from the template versions
 itself normally, starting from `0.0.0`.
 
 ## The version is `0.0.0`, always
@@ -16,12 +16,12 @@ inherited by nobody and would claim a release nothing can consume.
 
 | Carrier | Value |
 |---|---|
-| `package.json` `version` | `0.0.0` |
-| `package-lock.json` `version` and `packages[""].version` | `0.0.0` |
-| What the server reports (`--version`, `/healthz`, the MCP handshake) | `0.0.0`, read from `package.json` |
+| `Cargo.toml` `version` | `0.0.0` |
+| `Cargo.lock`, the `lxagents-template` package entry | `0.0.0` |
+| What the server reports (`--version`, `/healthz`, the MCP handshake) | `0.0.0`, compiled in from `Cargo.toml` |
 | Git tags and GitHub releases | None |
 
-`test/template-version.test.ts` fails if any of these leaves `0.0.0`. Never change it to make a
+`tests/template_version.rs` fails if any of these leaves `0.0.0`. Never change it to make a
 bump pass, and never propose a bump for the template, whatever the change.
 
 ## The release task
@@ -33,6 +33,6 @@ release notes:
   `## YYYY-MM-DD — {what changed}`, newest first;
 * closing the chain's task record.
 
-It never touches `package.json`, the lockfile, or a tag, and it never creates another
+It never touches `Cargo.toml`, `Cargo.lock`, or a tag, and it never creates another
 `wiki/logs/` directory. `wiki/logs/0/0/0/` is the one log directory, and unlike a released
 version's log it grows a section per chain.
