@@ -1,0 +1,41 @@
+[package]
+name = "lxagents-template"
+version = "0.0.0"
+edition = "2024"
+rust-version = "1.88"
+description = "Template for LXAgents Skill MCP servers: every markdown file in content/ is served read-only as its own tool."
+license = "MIT"
+authors = ["LXAgents"]
+repository = "https://github.com/LXAgents-Skills/template"
+homepage = "https://github.com/LXAgents-Skills/template#readme"
+keywords = ["mcp", "model-context-protocol", "agent-instructions", "lxagents", "template"]
+publish = false
+build = "build.rs"
+
+[lib]
+name = "skill_server"
+path = "src/lib.rs"
+
+[[bin]]
+name = "lxagents-template"
+path = "src/main.rs"
+
+[dependencies]
+axum = { version = "0.8", default-features = false, features = ["http1", "json", "tokio"] }
+rmcp = { version = "3.10", default-features = false, features = ["server", "transport-io", "transport-streamable-http-server"] }
+serde_json = "1"
+sha2 = "0.10"
+subtle = "2"
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "signal", "net", "io-std"] }
+tokio-util = "0.7"
+
+[dev-dependencies]
+http-body-util = "0.1"
+tower = { version = "0.5", features = ["util"] }
+
+[workspace]
+members = [".", "xtask"]
+
+[profile.release]
+strip = true
+lto = "thin"

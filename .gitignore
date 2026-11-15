@@ -1,7 +1,4 @@
-node_modules/
 
-# Compiled by `npm run build`, and by `prepare` on every `npm install`
-dist/
 *.log
 .env
 .env.*
@@ -13,3 +10,6 @@ coverage/
 
 # Locally cloned Skill MCP servers
 mcps/
+
+# Built by cargo, never committed
+/target/
