@@ -193,3 +193,17 @@ init end to end on a temporary copy); `cargo clippy --workspace --all-targets --
 and `cargo fmt --check` clean; stdio and HTTP answered by hand (initialize, tools/list,
 tools/call; 0.0.0.0 without a token exits 1; SIGTERM drains). **Not verified:** the Docker
 image, because this environment has the docker client but no daemon.
+
+### Task 3 — docs/rust
+
+Landed. Every source path in the rules and docs names its `.rs` file, and every command is a
+`cargo` command or the built binary. `.agents/rules/repository.md` is rewritten: the layout,
+the cargo commands, a "Rust, built by cargo" section (content compiled in, boot checks at
+boot, `Cargo.lock` committed, clippy and rustfmt clean), install by clone with `publish = false`,
+and the bans (no `unsafe`, no second tool list, no source file but `src/identity.rs` naming the
+server). `tool-ids.md` shows `OVERRIDE_BASES` as a Rust slice; `http-auth.md` names `router()`
+and the single `Host` check; `template-version.md` lists `Cargo.toml` and `Cargo.lock` as the
+carriers. The install guide registers `target/release/lxagents-template` with no `cwd`; the
+Docker, environment, architecture, overview, add-a-tool and create-a-new-repository pages,
+`README.md`, `AGENTS.md` and the repository map describe the Rust build. `cargo test --workspace`
+passes, the init end-to-end test included, so every template-only block still strips.

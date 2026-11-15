@@ -1,12 +1,13 @@
 # AGENTS.md
 
-This repository is `LXAgents-Skills/template`: a Skill MCP server, Node.js 20+, TypeScript compiled
-to ESM in `dist/`, that serves every markdown file in [`content/`](content/) read-only as its own tool.
+This repository is `LXAgents-Skills/template`: a Skill MCP server in Rust 1.88+, on the official
+MCP SDK (`rmcp`) with axum for HTTP, that serves every markdown file in [`content/`](content/)
+read-only as its own tool.
 Server ID `lxagents-template`, tool prefix `lxagents_skills_template_`.
 
 <!-- template-only -->
 **It is also the template every new Skill MCP repository in the organization starts from.**
-A new repository is created from it on GitHub, renamed with `npm run init`, and filled with
+A new repository is created from it on GitHub, renamed with `cargo xtask init`, and filled with
 its own `content/` — see [`wiki/guides/create-a-new-repository.md`](wiki/guides/create-a-new-repository.md).
 Everything outside this block is written so it stays true after `init` renames it; `init`
 deletes this block.
@@ -14,7 +15,7 @@ deletes this block.
 **The template's version is `0.0.0`, permanently.** Never bump it; its release branch is always
 `release/0.0.0` and carries release notes only. Read
 [`.agents/rules/template-version.md`](.agents/rules/template-version.md) before touching
-`package.json`, the lockfile, a tag, or `wiki/logs/`. It overrides the version rule below,
+`Cargo.toml`, `Cargo.lock`, a tag, or `wiki/logs/`. It overrides the version rule below,
 which is for the repositories made from the template.
 <!-- /template-only -->
 
@@ -22,7 +23,7 @@ which is for the repositories made from the template.
 
 | Set | Path | Published? |
 |---|---|---|
-| This repository's product | [`content/`](content/) | **Yes.** One tool per file, on the next boot. |
+| This repository's product | [`content/`](content/) | **Yes.** One tool per file, compiled in on the next build. |
 | This repository's own rules | [`.agents/`](.agents/) | No. Rules, indexes, agent wiki, memory. |
 | The organization's shared conventions | the `lxagents-shared-instruction` connector | Read through the connector, never copied here. |
 
@@ -90,11 +91,12 @@ and the condition for each, is in the automation tool, not here.
 * This repository's rules → `.agents/rules/{file}.md`. Routing → `.agents/index/{scope}-index.md`.
 * Agent knowledge → `.agents/wiki/{type}/{file}.md`. Memory → `.agents/memory/{type}/{file}.md`.
 * Human documentation → `wiki/{folder}/{file}.md`, no frontmatter. Releases → `wiki/logs/{Major}/{Minor}/{Patch}/`.
-* Server code → `src/`. The rename script → `scripts/`. Tests → `test/`.
+* Server code → `src/`, embedded by `build.rs`. The rename task → `xtask/`. Tests → `tests/`, and
+  unit tests beside the code.
 
 ## Version rule
 
-Never change the version without the user's approval: `package.json`, the release branch, and
+Never change the version without the user's approval: `Cargo.toml`, `Cargo.lock`, the release branch, and
 a new `wiki/logs/` directory are all version claims. A release is a patch bump unless the user
 asks for more.
 

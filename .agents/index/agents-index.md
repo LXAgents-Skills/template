@@ -16,7 +16,7 @@ description: Index of this repository's own rules - repository rules, tool IDs, 
 | [`../rules/http-auth.md`](../rules/http-auth.md) | When `MCP_AUTH_TOKEN` is required, the localhost `Host` rule, and secrets. |
 
 <!-- template-only -->
-Template only — `npm run init` deletes this file and this table:
+Template only — `cargo xtask init` deletes this file and this table:
 
 | File | Purpose |
 |---|---|

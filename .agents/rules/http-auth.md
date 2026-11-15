@@ -20,12 +20,14 @@ description: When MCP_AUTH_TOKEN is required - only for HTTP bound off loopback 
   runs before the body parser and before routing.
 * The loopback `Host` check is what stops a web page that rebinds its own name to `127.0.0.1`
   from reading a tokenless server through the browser. Do not remove it.
-* `createApp` refuses to build without a token unless `local` is true, and `local` defaults to
+* That check lives in `src/http/host.rs` and runs ahead of every route, `/healthz` included.
+  `rmcp`'s own `Host` check is turned off in `src/http/app.rs`, so there is exactly one.
+* `router()` (`src/http/app.rs`) refuses to build without a token unless `local` is true, and `local` defaults to
   false, so leaving an option out can never open the server.
 
 ## Secrets
 
-* `MCP_AUTH_TOKEN` is read at call time by `src/http/auth.ts`, not captured at import.
+* `MCP_AUTH_TOKEN` is read at call time by `src/http/auth.rs`, never cached.
 * Never log it, echo it, put it in an error, a test fixture, a Dockerfile `ENV` line, or a
   committed file. Error messages name the variable and the fix, never the value.
 * No tool reads a credential. A served file is public text.

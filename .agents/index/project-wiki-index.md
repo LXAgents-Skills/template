@@ -17,7 +17,7 @@ description: Index of wiki/ - the human documentation tree, excluding wiki/logs/
 | [`../../wiki/environments/docker.md`](../../wiki/environments/docker.md) | Building and running the container image. |
 
 <!-- template-only -->
-Template only — `npm run init` deletes this page and this table:
+Template only — `cargo xtask init` deletes this page and this table:
 
 | File | Purpose |
 |---|---|

@@ -14,7 +14,7 @@ without its folder or `.md`, lowercased, with `-` turned into `_`.
 
 An ID is at most 64 characters. If yours is longer, or another folder already has a file with
 the same name, pick a shorter or more specific filename, or give the file a base name in
-`OVERRIDE_BASES` (`src/instructions/naming.ts`). Only the base is ever shortened. The full rule:
+`OVERRIDE_BASES` (`src/instructions/naming.rs`). Only the base is ever shortened. The full rule:
 [`.agents/rules/tool-ids.md`](../../.agents/rules/tool-ids.md).
 
 ## 2. Write it
@@ -44,9 +44,12 @@ The part after ` — ` is the condition: the moment the tool is needed, not its 
 
 ## 4. Check it
 
-```powershell
-npm run tools; npm test
+```bash
+cargo run -- tools
+cargo test --workspace
 ```
 
-`npm run tools` prints every ID with its length. `npm test` fails if the file has no
-description, if its ID is too long or collides, or if the hub is missing it.
+`cargo run -- tools` prints every ID with its length. `cargo test` fails if the file has no
+description, if its ID is too long or collides, or if the hub is missing it. The file is
+compiled into the binary, so a running server picks it up only after `cargo build --release`
+and a restart.
