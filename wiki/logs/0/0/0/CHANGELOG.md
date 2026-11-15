@@ -4,6 +4,45 @@ The template's only version. It is copied, never released, so it stays at `0.0.0
 repository made from it starts its own history there. Each change to the template adds a dated
 section below, newest first.
 
+## 2026-11-15 — Migrate to Rust
+
+The server, its tests and the rename step are Rust, on the official MCP SDK (`rmcp` 3.10) with
+axum 0.8 for HTTP. `cargo build --release` produces one binary, `lxagents-template`, with
+`content/` compiled into it. Tool IDs, the ID rule, the boot checks, the HTTP routes and
+refusals, `MCP_AUTH_TOKEN` and the environment variables are unchanged. The version stays
+`0.0.0`.
+
+### Added
+
+- `Cargo.toml` (package `lxagents-template` 0.0.0, `publish = false`, edition 2024,
+  `rust-version` 1.88) and a committed `Cargo.lock`; dependencies `rmcp` 3.10.0, `axum` 0.8.9,
+  `tokio` 1.54.1, `tokio-util` 0.7.20, `serde_json` 1.0.154, `sha2` 0.10.9, `subtle` 2.6.1.
+- `build.rs`, which embeds every `.md` under `content/` and reruns when it changes.
+- `xtask/` and `.cargo/config.toml`: `cargo xtask init -- --org <org> --repo <repo>` replaces
+  `npm run init`, with the same flags, and is tested end to end on a temporary copy.
+- Integration tests in `tests/` and unit tests beside the code: 58 in all.
+
+### Modified
+
+- The server is a hand-written `rmcp` `ServerHandler`. stdio uses `rmcp`'s stdio transport;
+  HTTP mounts `rmcp`'s stateless Streamable HTTP service (JSON responses, no sessions) in an
+  axum router with the `Host` allow-list, the bearer check (SHA-256 compared in constant time)
+  and a 4 MiB JSON body check in front of it. `rmcp`'s own `Host` check is off, so there is one.
+- One binary replaces `dist/index.js` and `dist/cli.js`: with no arguments it serves from the
+  environment; `serve`, `tools`, `--help` and `--version` are as before. Client registrations
+  name `target/release/lxagents-template` and need no `cwd`.
+- `MCP_CLUSTER_WORKERS` sets tokio worker threads instead of forked processes; `1` runs on one
+  thread.
+- A change to `content/` needs a rebuild, because the set is compiled in.
+- The Docker image builds a static musl binary on `rust:1.97-alpine` and runs it on
+  `alpine:3.22` as uid 10001.
+- Every rule, guide and map describes the cargo build.
+
+### Deleted
+
+- `package.json`, `package-lock.json`, `tsconfig.json`, `tsconfig.check.json`, the TypeScript
+  sources in `src/`, `test/` and `scripts/`.
+
 ## 2026-11-11 — Migrate to TypeScript
 
 The server, its tests and `npm run init` are TypeScript under `strict`. `tsc` compiles `src/`
