@@ -10,3 +10,6 @@ coverage/
 
 # Untracked working plan - never staged, never committed
 /.agents/plans/
+
+# Locally cloned Skill MCP servers
+mcps/
