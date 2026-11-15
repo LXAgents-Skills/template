@@ -159,3 +159,37 @@ in order, and each branch is deleted as it merges where the platform allows it.
 ### Task 1 — plan/rust-migration
 
 Landed: this record and its row in `memory-index.md`. No code yet.
+
+### Task 2 — refactor/rust
+
+Landed. The TypeScript server, tests and init script are removed (`package.json`, the lockfile,
+both `tsconfig` files, `src/**/*.ts`, `test/`, `scripts/`), and the Rust server replaces them in
+the layout above.
+
+- `Cargo.toml`: package `lxagents-template` 0.0.0, `publish = false`, library `skill_server`,
+  binary `lxagents-template`; a workspace with `xtask`. Dependencies: `rmcp` 3.10 (`server`,
+  `transport-io`, `transport-streamable-http-server`), `axum` 0.8, `tokio`, `tokio-util`,
+  `serde_json`, `sha2`, `subtle`. `Cargo.lock` committed.
+- `build.rs` embeds every `.md` under `content/`; `src/instructions/surface.rs` runs every boot
+  check (invalid name, over 64, collision, stale override, missing description, empty set).
+- `src/server.rs` is a hand-written `ServerHandler`; every tool's input schema is an object with
+  no properties. An unknown tool is `-32602 Tool <name> not found`.
+- `src/http/`: axum router with the `Host` allow-list (`host.rs`), the bearer check (`auth.rs`,
+  SHA-256 digests compared with `subtle`), a JSON body check (`require_json`: malformed or over
+  4 MiB is 400 `-32700`), `GET /healthz`, `POST /mcp` to `rmcp`'s stateless JSON service, 405 for
+  other methods on `/mcp`, 404 for the rest. `rmcp`'s own `Host` check is off. Graceful shutdown
+  on SIGTERM and SIGINT with a 5-second grace.
+- `cargo xtask init` (`xtask/`): flags, identity defaults, constant rewrite in `src/identity.rs`,
+  `Cargo.toml` description and keywords, prefix/slug/server-ID swap in markdown, both manifests,
+  `tests/*.rs` and the Dockerfile, template-only blocks and files, history cleared, then
+  `cargo run -- tools` on the renamed server. `xtask` depends on the server crate for its
+  identity, so the prefix rule has one implementation.
+- Tests name the server through `SERVER_ID` and `tool_id`, not literals, except the
+  `CARGO_BIN_EXE_*` macro, which `init` rewrites.
+- Dockerfile: `rust:1.97-alpine` builds `--release --locked`; `alpine:3.22` runs it as uid 10001.
+
+Checks: `cargo test --workspace` 58 passed (48 in the server crate, 10 in `xtask`, including
+init end to end on a temporary copy); `cargo clippy --workspace --all-targets -- -D warnings`
+and `cargo fmt --check` clean; stdio and HTTP answered by hand (initialize, tools/list,
+tools/call; 0.0.0.0 without a token exits 1; SIGTERM drains). **Not verified:** the Docker
+image, because this environment has the docker client but no daemon.

@@ -1,0 +1,3 @@
+[alias]
+# `cargo xtask init -- --org <org> --repo <repo>`: the repository tasks, kept out of the server binary.
+xtask = "run --quiet --package xtask --"

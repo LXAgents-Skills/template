@@ -1,0 +1,12 @@
+[package]
+name = "xtask"
+version = "0.0.0"
+edition = "2024"
+publish = false
+description = "Repository tasks: `cargo xtask init` turns a fresh copy of the template into a new repository."
+
+[dependencies]
+# The server's own identity, read rather than re-implemented. `init` renames this key with the package.
+lxagents-template = { path = ".." }
+
+[dev-dependencies]

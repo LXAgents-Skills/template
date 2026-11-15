@@ -1,26 +1,22 @@
-# Installed inside the image, never copied in
-node_modules
-
-# Compiled inside the image, never copied in
-dist
+# Built inside the image, never copied in
+target
 
 # Version control and CI
 .git
 .gitignore
 .github
 
-# Not needed at runtime
-test
-scripts
+# Not needed to build
+tests
+xtask/tests
 wiki
 .agents
+mcps
 AGENTS.md
 README.md
 Dockerfile
 .dockerignore
-tsconfig.check.json
 compose.yaml
-
 
 # Local noise
 .env
@@ -29,4 +25,3 @@ compose.yaml
 .DS_Store
 .idea
 .vscode
-coverage/

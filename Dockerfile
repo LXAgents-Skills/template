@@ -1,75 +1,57 @@
 # syntax=docker/dockerfile:1
 
-# Two stages. The source is TypeScript, so the first stage installs the full tree and
-# compiles src/ into dist/; the second installs runtime dependencies only and copies
-# dist/ across. The compiler, the type packages and tsx never reach the image.
-FROM node:22-alpine AS build
+# Two stages. The first compiles the server into one static binary on Alpine (musl), with
+# content/ embedded in it; the second is a bare Alpine image holding that binary and nothing
+# else. The toolchain, the sources and the tests never reach the image.
+FROM rust:1.97-alpine AS build
+
+RUN apk add --no-cache musl-dev
 
 WORKDIR /build
 
-# Lifecycle scripts are disabled here too: `prepare` would run `tsc` before the
-# sources are copied in. The build is the explicit `npm run build` below.
-COPY package.json package-lock.json ./
-RUN npm ci --ignore-scripts
-
-COPY tsconfig.json ./
+# Everything `cargo build` reads: the workspace manifests and lockfile, the build script, the
+# sources, the set it embeds, and the xtask manifest the workspace names. `--locked` fails
+# rather than resolving something the lockfile does not contain, which is the point of building
+# an image from a versioned tree.
+COPY Cargo.toml Cargo.lock build.rs ./
+COPY .cargo ./.cargo
+COPY xtask ./xtask
 COPY src ./src
-RUN npm run build
-
-FROM node:22-alpine
-
-# Lifecycle scripts are disabled. `prepare` compiles TypeScript, which this stage has
-# no compiler for and no need of: dist/ comes from the build stage. Running scripts by
-# default is supply-chain risk with nothing to offset it. `--omit=dev` keeps the
-# toolchain and the test-only tree out of the image; `.dockerignore` already excludes
-# the test files themselves, so this image cannot run its own suite.
-#
-# Dependencies are installed from the lockfile only. `npm ci` fails rather than
-# silently resolving something the lockfile does not contain, which is the point
-# of building an image from a versioned tree.
-WORKDIR /srv
-
-COPY package.json package-lock.json ./
-RUN npm ci --ignore-scripts --omit=dev
-
-# `content/` is the product. It is copied, not generated, and it is the only
-# thing in this image that a change to the repository is expected to alter.
-COPY --from=build /build/dist ./dist
 COPY content ./content
+RUN cargo build --release --locked --bin lxagents-template
 
-# Not root. The process reads files and answers JSON-RPC, and nothing else.
-USER node
+FROM alpine:3.22
 
-# 3000 is `dist/index.js`'s default, and `PORT` overrides it at runtime. The
-# interface is `HOST`, which also defaults to 0.0.0.0 - every IPv4 interface.
+# Not root. The process answers JSON-RPC from text compiled into it, and nothing else.
+RUN adduser -D -H -u 10001 mcp
+COPY --from=build /build/target/release/lxagents-template /usr/local/bin/lxagents-template
+USER mcp
+
+# 3000 is the default, and `PORT` overrides it at runtime. The interface is `HOST`, which
+# defaults to 0.0.0.0 - every IPv4 interface.
 #
-# EXPOSE documents the port; it does not publish it. `docker run -p 3000:3000 …`
-# is what makes the port reachable from outside the container, and forgetting
-# it produces a container that is running, healthy, and connectable from
-# nowhere. See wiki/environments/docker.md.
+# EXPOSE documents the port; it does not publish it. `docker run -p 3000:3000 …` is what makes
+# the port reachable from outside the container. See wiki/environments/docker.md.
 EXPOSE 3000
 
-# HTTP is the default here, so a container that is run rather than spawned is
-# reachable:
+# HTTP is the default here, so a container that is run rather than spawned is reachable:
 #
 #   docker run --rm -p 3000:3000 -e MCP_AUTH_TOKEN lxagents-template
 #
-# HTTP refuses to start without MCP_AUTH_TOKEN (at least 32 characters): the container
-# exits 1 with a line saying why, and does not run open. The token is passed at run time and
-# is deliberately not an ENV line here, because a value baked into the image ships to
-# everyone who pulls it. stdio never reads it.
+# HTTP refuses to start without MCP_AUTH_TOKEN (at least 32 characters): the container exits 1
+# with a line saying why, and does not run open. The token is passed at run time and is
+# deliberately not an ENV line here, because a value baked into the image ships to everyone who
+# pulls it. stdio never reads it.
 #
-# stdio is one environment variable away, and the image serves both from the
-# same entry point, because they differ only in which transport is selected:
+# stdio is one environment variable away:
 #
 #   docker run --rm -i -e MCP_TRANSPORT=stdio lxagents-template
 #
-# For stdio, `-i` is not optional. Without it Docker does not attach stdin, the
-# server sees closed input, and it exits at once - which reads as a broken image
-# rather than a missing flag. There is nothing to publish in that form.
+# For stdio, `-i` is not optional. Without it Docker does not attach stdin, the server sees
+# closed input, and it exits at once - which reads as a broken image rather than a missing flag.
 #
-# Set MCP_ALLOWED_HOSTS whenever the container is reachable from anywhere but
-# this machine. The Host allow-list is off unless it is set, and the server says
-# so on startup. See wiki/environments/env.md.
+# Set MCP_ALLOWED_HOSTS whenever the container is reachable from anywhere but this machine. The
+# Host allow-list is off unless it is set, and the server says so on startup. See
+# wiki/environments/env.md.
 ENV MCP_TRANSPORT=http
-ENTRYPOINT ["node", "dist/index.js"]
+ENTRYPOINT ["/usr/local/bin/lxagents-template"]
